@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:math';
 
 import 'package:gestion_de_stock/components/search_field.dart';
@@ -21,7 +20,7 @@ List<Command> selectedCommands=[];
 @override
   void initState() {
   for(int i=0;i<10;i++){
-    int t= Random().nextInt(100000),v= Random().nextInt(100000);
+    int t= Random().nextInt(100000);
     exampleCommands.add(Command(
       id: i.toString(),
       phone1: '0540047893',
@@ -125,7 +124,10 @@ List<Command> selectedCommands=[];
                                                     ),
                                                   ),
                                                 ],
-                                      rows: List.generate(exampleCommands[i].productsIds!.length, (index) => myDataRow(exampleProducts.firstWhere((element) => element.id==exampleCommands[index].id), index))),
+                                      rows: List.generate(exampleCommands[i].productsIds!.length,
+                                              (index) => myDataRow(exampleProducts.firstWhere(
+                                                      (element) => element.id==exampleCommands[index].id),
+                                                  index))),
                                 )
                               ],
                               ),

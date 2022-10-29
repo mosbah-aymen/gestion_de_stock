@@ -1,0 +1,10 @@
+export  'package:flutter/material.dart';
+export 'constants/colors.dart';
+export 'package:gestion_de_stock/components/side_menu.dart';
+export 'package:gestion_de_stock/main.dart';
+export 'package:gestion_de_stock/models/client.dart';
+export 'package:gestion_de_stock/models/product.dart';
+export 'package:gestion_de_stock/screens/gestion des produits/list_products.dart';
+export 'package:gestion_de_stock/screens/home_page.dart';
+export 'components/window.dart';
+export 'constants/const.dart';

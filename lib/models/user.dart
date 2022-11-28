@@ -12,7 +12,7 @@ class User{
   String? id,name,phone,password;
   List<String> access=defaultAccess;
 
-  User({this.id, this.name, this.phone, this.password,required this.access});
+  User.admin({this.id, this.name, this.phone, this.password,required this.access});
 }
 
 final List<String> defaultAccess=[
@@ -26,4 +26,4 @@ final List<String> defaultAccess=[
   Configuration.id,
 ];
 
-User currentUser=User(access: defaultAccess,name: 'Hamza Bouchagour',phone: '0789029332',password: '123456');
+User currentUser=User.admin(access: defaultAccess,name: 'Hamza Bouchagour',phone: '0789029332',password: '123456');

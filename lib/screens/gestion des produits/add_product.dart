@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:gestion_de_stock/components/FormFieldCustom.dart';
+import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/user.dart';
 
@@ -318,7 +319,7 @@ if(widget.product!=null){
     exp = product.expDate ?? '/';
   }
 
-  ajouterProduct(){
+  ajouterProduct()async{
     if(allVerified()){
       Product product=Product(
         nom: nom.text,
@@ -339,8 +340,9 @@ if(widget.product!=null){
         fabDate: fab,
         expDate: exp,
       );
-      exampleProducts.add(product);
-                      Navigator.pop(context);
+      await ProductCrtl.addProduct(product).then((value) {
+        Navigator.pop(context);
+      });
     }
     else{
       showDialog(context: context, builder: (context)=>const AlertDialog(content: Text("Merci De Verifier Les Information Obligatoire"),));

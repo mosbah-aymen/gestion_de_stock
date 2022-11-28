@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:gestion_de_stock/components/search_field.dart';
+import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
-import 'package:gestion_de_stock/models/commande.dart';
-import 'package:gestion_de_stock/models/user.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20entree/add_achat.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/add_product.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
@@ -24,9 +21,9 @@ class _ListProductsState extends State<ListProducts> {
   int totalEnStock=0;
 
   void getStat(){
-    Product p=exampleProducts.first,p1=p;
+    Product p=products.first,p1=p;
     totalEnStock=0;
-    for (var value in exampleProducts) {
+    for (var value in products) {
       totalEnStock+=value.prixAchat!;
       if(value.quantityInStock!>p.quantityInStock!){
         plusEnStock=value.nom!;
@@ -40,48 +37,6 @@ class _ListProductsState extends State<ListProducts> {
   }
   @override
   void initState() {
-    for (int i = 2; i < 30; i++) {
-      int p=Random().nextInt(1000000);
-      products.add(
-        Product(
-          id: i.toString(),
-          createdAt: DateTime.now().toString().substring(0, 16),
-          prixAchat: p,
-          unitPrice: p,
-          prixVente: p+Random().nextInt(1000),
-          nom: 'Galaxy S$i',
-          addedBy: 'Hamza',
-          category: 'Téléphone',
-          expDate: '/',
-          fabDate: '/',
-          history: [],
-          fournisseurName: 'Fouad Zarour',
-          fournisseurPhone: '0567939383',
-          mark: 'Samsung',
-          minQuantity: 10,
-          nombreDesVente: Random().nextInt(50),
-          quantityInStock: Random().nextInt(50),
-          ref: '${Random().nextInt(1000)}x${Random().nextInt(1000)}',
-          updatedAt: DateTime.now().toString().substring(0, 16),
-        ),
-      );
-    }
-    exampleProducts=products;
-    for(int i=0;i<10;i++){
-        int t= Random().nextInt(100000);
-        exampleCommands.add(Command(
-          id: i.toString(),
-          phone1: '0540047893',
-          createdAt: DateTime.now().toString(),
-          versed: t-Random().nextInt(100),
-          totalPrice: t,
-          quantities: List.generate(Random().nextInt(10) , (index) =>Random().nextInt(10) ),
-          productsIds: List.generate(Random().nextInt(10) , (index) =>exampleProducts[Random().nextInt(20)].id! ),
-          clientName: 'moussa',
-          userName: currentUser.name,
-          clientId: '',
-        ));
-      }
     getStat();
 
     super.initState();
@@ -98,7 +53,7 @@ class _ListProductsState extends State<ListProducts> {
         'Plus En Stock'
       ],
       statValues: [
-        exampleProducts.length.toStringAsFixed(0),
+        products.length.toStringAsFixed(0),
         '${totalEnStock.toStringAsFixed(0)} DZD',
         plusVendu,
         plusEnStock,
@@ -141,7 +96,7 @@ class _ListProductsState extends State<ListProducts> {
         ),
       ],
       searchBar: Card(
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         child: SearchField(
             hint: 'Chercher ce que voulez ...',
             onSubmitted: (s) {
@@ -153,66 +108,80 @@ class _ListProductsState extends State<ListProducts> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
-              dividerThickness: 2,
-              columns: const [
-                DataColumn(
-                  label: Text(
-                    "Nº Ref",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Nom",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Catégory",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Mark",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Entrée en",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Quantintée",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    "Prix",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-              ],
-              rows: List.generate(
-                  products.where((element) => conditions(element)).length,
-                  (index) => myDataRow(
-                      products.reversed
-                          .where((element) => conditions(element))
-                          .elementAt(index),
-                      index))),
+          // child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          //   stream: FirebaseFirestore.instance.collection('products')
+          //       .orderBy('')
+          //       .snapshots(),
+          //   builder: (context, snapshot) {
+          //     products=[];
+          //     if(snapshot.hasData){
+          //       for (var value in snapshot.data!.docs) {
+          //         products.add(ProductCrtl.fromJSON(value.data(),value.id));
+          //       }
+          //     }
+          //     return DataTable(
+          //         dividerThickness: 2,
+          //         columns: const [
+          //           DataColumn(
+          //             label: Text(
+          //               "Nº Ref",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           DataColumn(
+          //             label: Text(
+          //               "Nom",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           DataColumn(
+          //             label: Text(
+          //               "Catégory",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           DataColumn(
+          //             label: Text(
+          //               "Mark",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           DataColumn(
+          //             label: Text(
+          //               "Entrée en",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           DataColumn(
+          //             label: Text(
+          //               "Quantintée",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //           DataColumn(
+          //             label: Text(
+          //               "Prix",
+          //               overflow: TextOverflow.ellipsis,
+          //               maxLines: 1,
+          //             ),
+          //           ),
+          //         ],
+          //         rows: List.generate(
+          //             products.where((element) => conditions(element)).length,
+          //             (index) => myDataRow(
+          //                 products.reversed
+          //                     .where((element) => conditions(element))
+          //                     .elementAt(index),
+          //                 index)));
+          //   }
+          // ),
+          child: Text('m'),
         ),
       ),
     );
@@ -220,23 +189,23 @@ class _ListProductsState extends State<ListProducts> {
 
   void delete(){
     if(selectedProducts.isEmpty){
-      showDialog(context: context, builder: (context)=>AlertDialog(
+      showDialog(context: context, builder: (context)=>const AlertDialog(
         content: Text('Selectionner les produit á supprimer'),
       ));
     }
     else {
       showDialog(context: context, builder: (context)=>AlertDialog(
-        title: Text('Etes-vous sûr de supprimer la selection?'),
+        title: const Text('Etes-vous sûr de supprimer la selection?'),
         actions: [TextButton(onPressed: (){
           for (var value in selectedProducts) {
             products.removeWhere((element) => element.id==value.id);
           }
 
           Navigator.pop(context);
-        }, child: Text('Supprimer')),
+        }, child: const Text('Supprimer')),
           TextButton(onPressed: (){
                    Navigator.pop(context);
-                  }, child: Text('Annuler')),
+                  }, child: const Text('Annuler')),
         ],
       )).then((value) {
         setState((){});

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "740176827982",
+    "project_id": "gds-pro-9159b",
+    "storage_bucket": "gds-pro-9159b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:740176827982:android:a3f8365862688e0318951f",
+        "android_client_info": {
+          "package_name": "com.example.gestion_de_stock"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "740176827982-nk5c9t92njugghiv79jso213van4m5ll.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4T52Gt5npLPkCcsBJD9vhn9eBZvPYeUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "740176827982-nk5c9t92njugghiv79jso213van4m5ll.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "740176827982-drra7td4uq9r313uvg41nocovh65nn23.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gestionDeStock"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,7 +2,7 @@
 import 'package:gestion_de_stock/imports.dart';
 
 class ProductCrtl{
-  Map<String,dynamic> toJSON(Product product){
+  static Map<String,dynamic> toJSON(Product product){
     return {
       'id':product.id,
       'nom':product.nom,
@@ -28,7 +28,7 @@ class ProductCrtl{
     };
   }
 
-  static Product fromJSON(Map<String, dynamic> data){
+  static Product fromJSON(Map<String, dynamic> data,String id){
     return Product(
       nom: data['nom'],
       unitPrice: data['unitPrice'],
@@ -50,11 +50,11 @@ class ProductCrtl{
       ref: data['ref'],
       description: data['description'],
       updatedAt: data['updatedAt'],
-      id: data['id'],
+      id: id,
     );
   }
 
   static Future addProduct(Product product)async{
-
+  // await FirebaseFirestore.instance.collection('products').doc().set(toJSON(product));
   }
 }

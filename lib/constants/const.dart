@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gestion_de_stock/imports.dart';
 
 InputDecoration decoration(String? hint, {String? prefix}) => InputDecoration(
@@ -24,5 +25,5 @@ InputDecoration decoration(String? hint, {String? prefix}) => InputDecoration(
         color: Colors.transparent,
       )),
     );
-
+User? user;
 List<String> categories=['EAU','roulements'];

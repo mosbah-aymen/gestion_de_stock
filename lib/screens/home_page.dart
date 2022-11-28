@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: MediaQuery.of(context).size.height,
             padding: const EdgeInsets.all(16),
             child: Card(
-              child: Expanded(child: accueil(context, idPage)),
+              child: accueil(context, idPage),
             ),
           )),
         ],

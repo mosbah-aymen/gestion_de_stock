@@ -22,4 +22,6 @@ class Command{
       this.versed,
       this.rest,});
 }
-List<Command> exampleCommands=[];
+List<Command> exampleCommands=[
+
+];

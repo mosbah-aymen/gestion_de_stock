@@ -13,8 +13,6 @@ class Product {
       expDate,
   description,
       category;
-
-
   List<String>? history=[];
 
   int? unitPrice, quantityInStock, minQuantity,prixAchat,prixVente,nombreDesVente;

@@ -5,7 +5,7 @@ import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/achat.dart';
 import 'package:gestion_de_stock/models/user.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
-import 'package:gestion_de_stock/screens/workspace.dart';
+import 'package:gestion_de_stock/components/workspace.dart';
 
 class ListEntree extends StatefulWidget {
   static const String id = 'List Entree';

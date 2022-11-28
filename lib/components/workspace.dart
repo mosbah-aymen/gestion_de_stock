@@ -10,7 +10,6 @@ class WorkSpace extends StatelessWidget {
       {Key? key, required this.headChildren, this.child, this.searchBar,this.statValues,this.statTitles})
       : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -30,10 +29,11 @@ class WorkSpace extends StatelessWidget {
                 )
               : const SizedBox(),
           Expanded(
-              flex: 10,
-              child: SizedBox(
-                child: child,
-              ))
+            flex: 10,
+            child: SizedBox(
+              child: child,
+            ),
+          )
         ],
       ),
     );

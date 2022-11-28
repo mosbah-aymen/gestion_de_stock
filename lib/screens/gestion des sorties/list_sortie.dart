@@ -5,7 +5,7 @@ import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/commande.dart';
 import 'package:gestion_de_stock/models/user.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
-import 'package:gestion_de_stock/screens/workspace.dart';
+import 'package:gestion_de_stock/components/workspace.dart';
 class ListSorties extends StatefulWidget {
   static const String id = 'List Sorties';
   const ListSorties({Key? key}) : super(key: key);
@@ -20,20 +20,21 @@ List<Command> selectedCommands=[];
 @override
   void initState() {
   for(int i=0;i<10;i++){
-    int t= Random().nextInt(100000);
-    exampleCommands.add(Command(
-      id: i.toString(),
-      phone1: '0540047893',
-      createdAt: DateTime.now().toString(),
-      versed: t-Random().nextInt(100),
-      totalPrice: t,
-      quantities: List.generate(i+2, (index) =>Random().nextInt(10) ),
-      productsIds: List.generate(i+2, (index) =>exampleProducts[Random().nextInt(20)].id! ),
-      clientName: 'moussa',
-      userName: currentUser.name,
-      clientId: '',
-    ));
-  }
+      int t= Random().nextInt(100000);
+      exampleCommands.add(Command(
+        id: i.toString(),
+        phone1: '0540047893',
+        createdAt: DateTime.now().toString(),
+        versed: t-Random().nextInt(100),
+        totalPrice: t,
+        quantities: List.generate(Random().nextInt(10) , (index) =>Random().nextInt(10) ),
+        productsIds: List.generate(Random().nextInt(10) , (index) =>exampleProducts[Random().nextInt(20)].id! ),
+        clientName: 'moussa',
+        userName: currentUser.name,
+        clientId: '',
+      ));
+      print(i);
+    }
   super.initState();
   }
   @override
@@ -126,7 +127,7 @@ List<Command> selectedCommands=[];
                                                 ],
                                       rows: List.generate(exampleCommands[i].productsIds!.length,
                                               (index) => myDataRow(exampleProducts.firstWhere(
-                                                      (element) => element.id==exampleCommands[index].id),
+                                                      (element) => element.id==exampleCommands[i].productsIds![index]),
                                                   index))),
                                 )
                               ],
@@ -138,8 +139,9 @@ List<Command> selectedCommands=[];
     );
   }
   bool conditions(Command command){
-    return command.id!.contains(search);
-  }
+    return command.id!.contains(search)||
+    command.clientName!.toLowerCase().startsWith(search)||
+        command.userName!.toLowerCase().startsWith(search);}
 
   void showDetails(Product product) {
       showDialog(

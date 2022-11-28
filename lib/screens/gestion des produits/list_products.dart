@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:gestion_de_stock/components/search_field.dart';
 import 'package:gestion_de_stock/imports.dart';
+import 'package:gestion_de_stock/models/commande.dart';
+import 'package:gestion_de_stock/models/user.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20entree/add_achat.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/add_product.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20sorties/nouveur_vente.dart';
-import 'package:gestion_de_stock/screens/workspace.dart';
+import 'package:gestion_de_stock/components/workspace.dart';
 
 class ListProducts extends StatefulWidget {
   static const String id = 'List Products';
@@ -65,6 +67,21 @@ class _ListProductsState extends State<ListProducts> {
       );
     }
     exampleProducts=products;
+    for(int i=0;i<10;i++){
+        int t= Random().nextInt(100000);
+        exampleCommands.add(Command(
+          id: i.toString(),
+          phone1: '0540047893',
+          createdAt: DateTime.now().toString(),
+          versed: t-Random().nextInt(100),
+          totalPrice: t,
+          quantities: List.generate(Random().nextInt(10) , (index) =>Random().nextInt(10) ),
+          productsIds: List.generate(Random().nextInt(10) , (index) =>exampleProducts[Random().nextInt(20)].id! ),
+          clientName: 'moussa',
+          userName: currentUser.name,
+          clientId: '',
+        ));
+      }
     getStat();
 
     super.initState();

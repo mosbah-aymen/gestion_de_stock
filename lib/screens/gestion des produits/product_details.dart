@@ -126,11 +126,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                         ),
                         Expanded(
                           child: Container(
+                            width:double.infinity,
                             margin:const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               border:
                                   Border.all(width: 0.4, color: Colors.black54),
-                              color: secondaryColor.withOpacity(0.07),
+                              color: secondaryColor.withOpacity(0.01),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: SingleChildScrollView(

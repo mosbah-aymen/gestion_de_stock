@@ -4,7 +4,7 @@ import 'package:gestion_de_stock/models/fourniseur.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20fourniseurs/add_fournisseur.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20fourniseurs/fournisseur_details.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/add_product.dart';
-import 'package:gestion_de_stock/screens/workspace.dart';
+import 'package:gestion_de_stock/components/workspace.dart';
 
 class ListFournisseur extends StatefulWidget {
   static const String id = 'List Fournisseurs';

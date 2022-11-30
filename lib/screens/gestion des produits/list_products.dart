@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gestion_de_stock/components/search_field.dart';
 import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
@@ -35,16 +36,26 @@ class _ListProductsState extends State<ListProducts> {
       }
     }
   }
+  Future deleteProducts()async{
+    for (var value in selectedProducts) {
+                      await   FirebaseFirestore.instance.doc("/products/${value.id}").delete();
+                     }
+  }
+
   @override
   void initState() {
-    getStat();
+    if(products.isNotEmpty){
+      getStat();
+    }
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    getStat();
+    if(products.isNotEmpty){
+      getStat();
+    }
     return WorkSpace(
       statTitles: const[
         'Nombre De Produit',
@@ -60,14 +71,43 @@ class _ListProductsState extends State<ListProducts> {
       ],
       headChildren: [
         HeaderElement(
-          title: 'Ajouter',
+          title: 'Supprimer',
           icon: Icons.add,
-          onTap: () {
-            showDialog(context: context, builder: (context)=>const AddProduct()).then((value) {
-              setState(() {});
-            });
+          onTap: () async{
+           await showDialog(context: context, builder: (context)=> AlertDialog(
+              title: const Text('Attention'),
+              content: const Text('Voulez vous vraiment Supprimer tous les produit selectionnés'),
+              actions: [
+                TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('Annuler')),
+                TextButton(onPressed: ()async{
+                 await deleteProducts().then((value) {
+                   Navigator.pop(context);
+                 });
+                }, child: const Text('Supprimer')),
+              ],
+            )).then((value) {
+              setState((){});
+           });
           },
         ),
+        HeaderElement(
+                 title: 'Modifier',
+                 icon: Icons.add,
+                 onTap: () {
+                   showDialog(context: context, builder: (context)=> AddProduct(product: selectedProducts.first,)).then((value) {
+                     setState(() {});
+                   });
+                 },
+               ),
+        HeaderElement(
+                 title: 'Ajouter',
+                 icon: Icons.add,
+                 onTap: () {
+                   showDialog(context: context, builder: (context)=>const AddProduct()).then((value) {
+                     setState(() {});
+                   });
+                 },
+               ),
         HeaderElement(
           title: 'Vente',
           icon: Icons.sell_outlined,
@@ -108,80 +148,83 @@ class _ListProductsState extends State<ListProducts> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          // child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          //   stream: FirebaseFirestore.instance.collection('products')
-          //       .orderBy('')
-          //       .snapshots(),
-          //   builder: (context, snapshot) {
-          //     products=[];
-          //     if(snapshot.hasData){
-          //       for (var value in snapshot.data!.docs) {
-          //         products.add(ProductCrtl.fromJSON(value.data(),value.id));
-          //       }
-          //     }
-          //     return DataTable(
-          //         dividerThickness: 2,
-          //         columns: const [
-          //           DataColumn(
-          //             label: Text(
-          //               "Nº Ref",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //           DataColumn(
-          //             label: Text(
-          //               "Nom",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //           DataColumn(
-          //             label: Text(
-          //               "Catégory",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //           DataColumn(
-          //             label: Text(
-          //               "Mark",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //           DataColumn(
-          //             label: Text(
-          //               "Entrée en",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //           DataColumn(
-          //             label: Text(
-          //               "Quantintée",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //           DataColumn(
-          //             label: Text(
-          //               "Prix",
-          //               overflow: TextOverflow.ellipsis,
-          //               maxLines: 1,
-          //             ),
-          //           ),
-          //         ],
-          //         rows: List.generate(
-          //             products.where((element) => conditions(element)).length,
-          //             (index) => myDataRow(
-          //                 products.reversed
-          //                     .where((element) => conditions(element))
-          //                     .elementAt(index),
-          //                 index)));
-          //   }
-          // ),
-          child: Text('m'),
+          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+            stream: FirebaseFirestore.instance.collection('products')
+                .snapshots(),
+            builder: (context, snapshot) {
+              products=[];
+
+              if(snapshot.hasData){
+                print(snapshot.data!.docs);
+                for (var value in snapshot.data!.docs) {
+                  products.add(ProductCrtl.fromJSON(value.data(),value.id));
+                }
+              }
+              return !snapshot.hasData?
+                  const Center(child: CircularProgressIndicator(),)
+                  :DataTable(
+                  dividerThickness: 2,
+                  columns: const [
+                    DataColumn(
+                      label: Text(
+                        "Nº Ref salim",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Nom",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Catégory",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Mark",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Entrée en",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Quantintée",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Prix",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                  rows: List.generate(
+                      products.where((element) => conditions(element)).length,
+                      (index) => myDataRow(
+                          products.reversed
+                              .where((element) => conditions(element))
+                              .elementAt(index),
+                          index)));
+            }
+          ),
+          // child: Text('m'),
         ),
       ),
     );

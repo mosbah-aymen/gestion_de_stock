@@ -26,15 +26,18 @@ class StatCard extends StatelessWidget {
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Center(
-                                              child: Text(value ,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20,
+                                            Expanded(
+                                              child: Center(
+                                                child: Text(value ,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                                maxLines: 2,
+                                                textAlign: TextAlign.center,
+                                                overflow: TextOverflow.ellipsis,),
                                               ),
-                                              maxLines: 4,
-                                              overflow: TextOverflow.ellipsis,),
                                             ),
                                             Text(unit,style: const TextStyle(
                                                                            color: Colors.white,

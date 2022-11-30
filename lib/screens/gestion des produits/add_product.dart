@@ -43,8 +43,8 @@ if(widget.product!=null){
         header: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            button(widget.product==null?'Ajouter':'Modifier', widget.product==null?Icons.add:Icons.edit_note, () {
-              ajouterProduct();
+            button(widget.product==null?'Ajouter':'Modifier', widget.product==null?Icons.add:Icons.edit_note, () async{
+             await ajouterProduct();
             }),
             const Text(
               "Nouveau Produit",
@@ -319,7 +319,7 @@ if(widget.product!=null){
     exp = product.expDate ?? '/';
   }
 
-  ajouterProduct()async{
+ Future ajouterProduct()async{
     if(allVerified()){
       Product product=Product(
         nom: nom.text,
@@ -336,13 +336,13 @@ if(widget.product!=null){
         updatedAt:  DateTime.now().toString(),
         addedBy: currentUser.name,
         history: ['Ajouté par ${currentUser.name} '],
-        id: Random().nextInt(1000000000).toString(),
         fabDate: fab,
         expDate: exp,
       );
-      await ProductCrtl.addProduct(product).then((value) {
-        Navigator.pop(context);
-      });
+      print(product.toString());
+      await ProductCrtl.addProduct(product);
+      print(product.toString());
+
     }
     else{
       showDialog(context: context, builder: (context)=>const AlertDialog(content: Text("Merci De Verifier Les Information Obligatoire"),));

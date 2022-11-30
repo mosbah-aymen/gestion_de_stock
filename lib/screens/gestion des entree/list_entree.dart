@@ -23,32 +23,11 @@ class _ListEntreeState extends State<ListEntree> {
   bool paid=false;
   @override
   void initState() {
-    for (int i = 0; i < 100; i++) {
-      int t= Random().nextInt(100000),v= Random().nextInt(100000);
-      exampleAchat.add(
-        Achat(products: exampleProducts.sublist(0,Random().nextInt(10)),
-        id: i.toString(),
-        totalPrice: t,
-        fournisseurPhone: '0590930303',
-        fournisseurName: 'Mosbah Eddine Layadi',
-        description: '',
-        verse:v,
-        rest: t-v,
-        userId: currentUser.id,
-        fournisseurId: '0',
-        createdAt: DateTime.now().toString(),
 
-        userName: "Hamza")
-      );
-    }
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    achats=[];
-    for (var value in exampleAchat.where((element) => condition(element, paid))) {
-      achats.add(value);
-};
     return WorkSpace(headChildren: [
       HeaderElement(title: 'Paid',
       onTap: (){
@@ -81,13 +60,13 @@ class _ListEntreeState extends State<ListEntree> {
                                           : Colors.white54,
                 textColor: secondaryColor,
                 childrenPadding: const EdgeInsets.all(10),
-                leading:                     Text(achats[i].id??"",style: TextStyle(color: secondaryColor),),
+                leading:                     Text(achats[i].id??"",style: const TextStyle(color: secondaryColor),),
                 trailing:                     Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Total =${achats[i].totalPrice} DZD",
-                    style: TextStyle(color: secondaryColor,fontSize: 17,fontWeight: FontWeight.bold),),
+                    style: const TextStyle(color: secondaryColor,fontSize: 17,fontWeight: FontWeight.bold),),
                     Text("Payer par: ${achats[i].userName}"),
                   ],
                 ),

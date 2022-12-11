@@ -2,12 +2,17 @@ import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/user.dart';
 import 'package:gestion_de_stock/screens/configuration/configuration.dart';
 import 'package:gestion_de_stock/screens/gestion%20de%20caisse/caisse.dart';
+import 'package:gestion_de_stock/screens/gestion%20des%20category/categories.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20clients/List_client.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20entree/list_entree.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20fourniseurs/list_fournisseurs.dart';
+import 'package:gestion_de_stock/screens/gestion%20des%20magasin/gestion_magasins.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/list_products.dart';
+import 'package:gestion_de_stock/screens/gestion%20des%20roles/list_role.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20sorties/list_sortie.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20users/list_users.dart';
+import 'package:gestion_de_stock/screens/scan%20direct/scan_direct.dart';
+import 'package:gestion_de_stock/screens/statistiques/statistics.dart';
 
 
 class SideMenu extends StatelessWidget {
@@ -37,7 +42,24 @@ class SideMenu extends StatelessWidget {
               ],
             ),
           ),
-          Divider(color: Colors.white54,),
+          const Divider(color: Colors.white54,),
+          DrawerListTile(
+                                                          title: "Scan Direct",
+                                                          icon: Icons.qr_code_scanner,
+                                                          press: () {
+                                                             onPageChanged(ScanDirect.id);
+                                                            },
+            enabled: currentUser.access.contains(ScanDirect.id),
+                                                        ),
+          DrawerListTile(
+                                                title: "Caisse",
+                                                icon: Icons.account_balance_wallet_outlined,
+                                                press: () {
+                                                  onPageChanged(Caisse.id);
+                                                  },
+                    enabled: currentUser.access.contains(Caisse.id),
+
+                                              ),
           DrawerListTile(
             title: "Gestion Des Produits",
             icon: Icons.keyboard_command_key,
@@ -47,16 +69,16 @@ class SideMenu extends StatelessWidget {
             enabled: currentUser.access.contains(ListProducts.id),
           ),
           DrawerListTile(
-                     title: "Gestion Des Entrées",
-                     icon: Icons.input_outlined,
+                     title: "Gestion Des Achats",
+                     icon: Icons.inventory_rounded,
                      press: () {
                        onPageChanged(ListEntree.id);
                        },
             enabled: currentUser.access.contains(ListEntree.id),
                    ),
           DrawerListTile(
-                               title: "Gestion Des Sortie",
-                               icon: Icons.output,
+                               title: "Gestion Des Ventes",
+                               icon: Icons.sell,
                                press: () {
                                  onPageChanged(ListSorties.id);
                                  },
@@ -83,6 +105,23 @@ class SideMenu extends StatelessWidget {
 
                                       ),
           DrawerListTile(
+                                                title: "Gestion Des Categories",
+                                                icon: Icons.category,
+                                                press: () {
+                                                  onPageChanged(Categories.id);
+                                                  },
+            enabled: currentUser.access.contains(Categories.id),
+
+                                              ),
+          DrawerListTile(
+                                                 title: "Sites/Magasins",
+                                                 icon: Icons.store_mall_directory_rounded,
+                                                 press: () {
+                                                   onPageChanged(ListMagasins.id);
+                                                   },
+            enabled: currentUser.access.contains(ListMagasins.id),
+                                               ),
+          DrawerListTile(
                                         title: "Gestion Des Utilisateur",
                                         icon: Icons.admin_panel_settings,
                                         press: () {
@@ -91,14 +130,22 @@ class SideMenu extends StatelessWidget {
             enabled: currentUser.access.contains(ListUsers.id),
                                       ),
           DrawerListTile(
-                                        title: "Caisse",
-                                        icon: Icons.account_balance_wallet_outlined,
-                                        press: () {
-                                          onPageChanged(Caisse.id);
-                                          },
-            enabled: currentUser.access.contains(Caisse.id),
+                                                       title: "Gestion Des Roles",
+                                                       icon: Icons.work,
+                                                       press: () {
+                                                         onPageChanged(ListRole.id);
+                                                         },
+            enabled: currentUser.access.contains(ListRole.id),
 
-                                      ),
+                                                     ),
+          DrawerListTile(
+                                                 title: "Statistiques",
+                                                 icon: Icons.pie_chart_sharp,
+                                                 press: () {
+                                                   onPageChanged(Statistics.id);
+                                                   },
+            enabled: currentUser.access.contains(Statistics.id),
+                                               ),
           DrawerListTile(
                                         title: "Configuration",
                                         icon: Icons.settings,
@@ -113,6 +160,7 @@ class SideMenu extends StatelessWidget {
     );
   }
 }
+
 
 class DrawerListTile extends StatelessWidget {
   const DrawerListTile({
@@ -131,15 +179,19 @@ final bool? enabled;
   Widget build(BuildContext context) {
     return enabled==true? ListTile(
       onTap: press,
+      hoverColor: Colors.white54,
+      tileColor: idPage==title?Colors.white:null,
       horizontalTitleGap: 0.0,
       leading:Icon(
         icon,
-        color: Colors.white,
+        color: idPage==title?secondaryColor:Colors.white,
 
       ),
       title: Text(
         title,
-        style:const  TextStyle(color: Colors.white),
+        style:TextStyle(
+          color: idPage==title?secondaryColor:Colors.white,
+        ),
       ),
     ):const SizedBox();
   }

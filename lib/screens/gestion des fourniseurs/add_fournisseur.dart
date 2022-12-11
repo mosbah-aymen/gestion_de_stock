@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dzair_data_usage/commune.dart';
 import 'package:dzair_data_usage/dzair.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:dzair_data_usage/wilaya.dart';
 import 'package:flutter/services.dart';
 import 'package:gestion_de_stock/components/FormFieldCustom.dart';
+import 'package:gestion_de_stock/controllers/fournisseur_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/fourniseur.dart';
 
@@ -18,9 +20,9 @@ class AddFournisseur extends StatefulWidget {
 class _AddFournisseurState extends State<AddFournisseur> {
   TextEditingController nom = TextEditingController(),
       prenom = TextEditingController(),
+      phone = TextEditingController(),
       commune = TextEditingController(),
-      wilaya = TextEditingController(),
-      phone = TextEditingController();
+      wilaya = TextEditingController();
 
   List<Wilaya?>? wilayas = [];
   List<Commune?>? communes = [];
@@ -53,8 +55,10 @@ class _AddFournisseurState extends State<AddFournisseur> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             button(modification ? "Modifier" : 'Ajouter',
-                modification ? Icons.update : Icons.add, () {
-              ajouterFournisseur();
+                modification ? Icons.update : Icons.add, () async{
+              await ajouterFournisseur().then((value) {
+                Navigator.pop(context);
+              });
             }),
             const Text(
               "Nouveau Fournisseur",
@@ -171,18 +175,18 @@ class _AddFournisseurState extends State<AddFournisseur> {
     commune.text = fournisseur.commune ?? '';
   }
 
-  ajouterFournisseur() {
+  Future ajouterFournisseur() async {
     if (allVerified()) {
+      showDialog(context: context, builder: (context)=>const Center(child: CircularProgressIndicator(),),barrierDismissible: false);
       if (modification == true) {
         widget.fournisseur!.commune = commune.text;
         widget.fournisseur!.wilaya = wilaya.text;
         widget.fournisseur!.nom = nom.text;
         widget.fournisseur!.phone1 = phone.text;
         widget.fournisseur!.prenom = prenom.text;
-        exampleFournisseurs[exampleFournisseurs.indexWhere(
-                (element) => element.nom == widget.fournisseur!.nom)] =
-            widget.fournisseur!;
-        Navigator.pop(context);
+        await FournisseurCrtl.updateFournisseur(widget.fournisseur!).then((value) {
+          Navigator.pop(context);
+        });
       } else {
         Fournisseur fournisseur = Fournisseur(
           nom: nom.text,
@@ -193,8 +197,9 @@ class _AddFournisseurState extends State<AddFournisseur> {
           createdAt: DateTime.now().toString(),
           lastCommandeAt: DateTime.now().toString(),
         );
-        exampleFournisseurs.add(fournisseur);
-        Navigator.pop(context);
+        await FournisseurCrtl.addFournisseur(fournisseur).then((value) {
+          Navigator.pop(context);
+        });
       }
     } else {
       showDialog(
@@ -205,26 +210,4 @@ class _AddFournisseurState extends State<AddFournisseur> {
     }
   }
 
-  Widget button(String title, IconData icon, Function onPressed) =>
-      ElevatedButton.icon(
-        style: TextButton.styleFrom(
-          backgroundColor: primaryColor,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 15,
-          ),
-        ),
-        onPressed: () {
-          onPressed();
-        },
-        icon: Icon(
-          icon,
-          size: 20,
-          color: Colors.white,
-        ),
-        label: Text(
-          title,
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
 }

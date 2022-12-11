@@ -20,18 +20,5 @@ class Client {
       this.spentLastMonth,
       });
 }
-List<Client> exampleClients=[Client(
-  phone1: '0655750571',
-  rest: 0,
-  wilaya: 'Setif',
-  commune: 'Commune',
-   versed: 3000,
-  totalCommandes: 3,
-  createdAt: DateTime.now().toString(),
-  totalSpent: 3000,
-  prenom: 'Moussa',
-  nom: 'Aouinane',
-  phone2: '0767878787',
-  spentLastMonth: 1000,
-  id: '12'
-)];
+
+List<Client> exampleClients=[];

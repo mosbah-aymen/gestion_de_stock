@@ -1,5 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:gestion_de_stock/components/FormFieldCustom.dart';
 import 'package:gestion_de_stock/components/StatCard.dart';
+import 'package:gestion_de_stock/controllers/achat_crtl.dart';
+import 'package:gestion_de_stock/controllers/fournisseur_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
+import 'package:gestion_de_stock/models/achat.dart';
 import 'package:gestion_de_stock/models/fourniseur.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
 
@@ -14,11 +20,11 @@ class FournisseurDetails extends StatefulWidget {
 }
 
 class _FournisseurDetailsState extends State<FournisseurDetails> {
-  List<Product> products=[];
-
+  List<Achat> achats=[];
+  int versement=0;
   @override
   Widget build(BuildContext context) {
-    products=exampleProducts.sublist(0,10);
+    // products=exampleProducts.sublist(0,10);
     return Window(header:  Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children:const [
@@ -35,114 +41,232 @@ class _FournisseurDetailsState extends State<FournisseurDetails> {
               ],
             ), body: Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Expanded(child: Padding(
-                        padding:  EdgeInsets.only(top: 20),
-                        child:  CircleAvatar(
-                                                       backgroundColor: bgColor,
-                                                       backgroundImage:
-                          AssetImage('assets/images/profile.png'),
-                                                       radius: 100,
-                                                     ),
-                      )),
-                      Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 50.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              productDetails('Nom', widget.fournisseur.nom??''),
-                              productDetails('Prénom', widget.fournisseur.prenom??''),
-                              productDetails('Téléphone', widget.fournisseur.phone1??''),
-                              productDetails('Wilaya', widget.fournisseur.wilaya??''),
-                              productDetails('Commune', widget.fournisseur.commune??''),
-                              productDetails('Ajouter depuis', widget.fournisseur.createdAt!.substring(0,14)),
-                              productDetails('Derniere Commande En', widget.fournisseur.lastCommandeAt!.substring(0,14)),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Expanded(child: Padding(
+                          padding:  EdgeInsets.only(top: 20),
+                          child:  CircleAvatar(
+                                                         backgroundColor: bgColor,
+                                                         backgroundImage:
+                            AssetImage('assets/images/profile.png'),
+                                                         radius: 100,
+                                                       ),
+                        )),
+                        Expanded(
+                          flex: 3,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 50.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Card(
+                                  color: Colors.teal,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 10,right: 20,left: 20,top: 10),
+                                    child: Column(
+                                      children: [
+                                        const Text('Information de Fournisseur:',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),),
+                                        const Divider(color: Colors.white,),
+                                        productDetails('Nom', widget.fournisseur.nom??''),
+                                                                       productDetails('Prénom', widget.fournisseur.prenom??''),
+                                                                       productDetails('Téléphone', widget.fournisseur.phone1??''),
+                                                                       productDetails('Wilaya', widget.fournisseur.wilaya??''),
+                                                                       productDetails('Commune', widget.fournisseur.commune??''),
+                                                                       productDetails('Ajouter depuis', widget.fournisseur.createdAt!.substring(0,14)),
+                                                                       productDetails('Derniere Commande En', widget.fournisseur.lastCommandeAt!.substring(0,14)),
 
-                            ],
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: FieldNewPackageForm(title: 'Versement',
+                                  icon: Icons.paid_outlined,
+                                    child: TextFormField(
+
+                                      onFieldSubmitted: (s){
+                                        versement=int.tryParse(s)??0;
+                                        showDialog(context: context, builder: (context)=> AlertDialog(
+                                          title: const Text("Confirmation"),
+                                          content: Text("Merci de confirmer que ${widget.fournisseur.nom} ${widget.fournisseur.prenom} a verser $versement ."),
+                                          actions: [
+                                            TextButton(onPressed: (){
+
+                                            }, child: const Text('Confirmer')),
+                                            TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('Annuler')),
+
+                                          ],
+                                        ));
+                                      },
+                                      inputFormatters: [
+                                                                         FilteringTextInputFormatter.allow(
+                                                                             RegExp('[0-9]')),
+                                                                       ],
+                                      decoration: decoration('Versement'),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
 
-                      Expanded(
-                          flex:2,child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [ StatCard(value: widget.fournisseur.totalCommand.toStringAsFixed(0), title: 'Total Commandes', unit: "commande"),
-                          StatCard(value: widget.fournisseur.versed.toStringAsFixed(0), title: 'Versé', unit: "DZD"),
-                          StatCard(value: widget.fournisseur.rest.toStringAsFixed(0), title: 'Resté', unit: "DZD"),
-                          StatCard(value: (widget.fournisseur.versed+widget.fournisseur.rest).toStringAsFixed(0), title: 'Total', unit: "DZD"),
-                      ],))
-                    ],
-                  ),
-                  Divider(
-                                         thickness: 0.5,
-                                         color: secondaryColor,
-                                       ),
-                  Expanded(
-                    child: SizedBox(
-                                              child: SingleChildScrollView(
-                                                child: DataTable(columns:const [
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Nº Ref",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Nom",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Catégory",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Mark",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Entrée en",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Quantintée",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                                DataColumn(
-                                                                  label: Text(
-                                                                    "Prix",
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    maxLines: 1,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                    rows: List.generate(products.length, (index) => myDataRow(products[index], index))),
+                        Expanded(
+                            flex:2,child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [ StatCard(value: widget.fournisseur.totalCommand.toStringAsFixed(0), title: 'Total Commandes', unit: "CMD"),
+                            StatCard(value: widget.fournisseur.versed.toStringAsFixed(0), title: 'Versé', unit: "DZD"),
+                            StatCard(value: widget.fournisseur.rest.toStringAsFixed(0), title: 'Resté', unit: "DZD"),
+                            StatCard(value: (widget.fournisseur.versed+widget.fournisseur.rest).toStringAsFixed(0), title: 'Total', unit: "DZD"),
+                        ],))
+                      ],
+                    ),
+                    const Divider(
+                                           thickness: 0.5,
+                                           color: secondaryColor,
+                                         ),
+                    SizedBox(
+                                              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                                                stream: FirebaseFirestore.instance.collection('achats').where('fournisseurId',isEqualTo: widget.fournisseur.id!).snapshots(),
+                                                builder: (context, snapshot) {
+                                                  // achats.clear();
+                                                  if(snapshot.hasData){
+                                                    for (var value in snapshot.data!.docs) {
+                                                      achats.add(AchatCrtl.fromJSON(value.data(), value.id));
+                                                    }
+                                                  }
+                                                  return !snapshot.hasData?
+                                                      const Center(child: CircularProgressIndicator(),)
+                                                      :achats.isEmpty?
+                                                      const Center(
+                                                        child: Text("Aucune Achat Terminé",
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),),
+                                                      )
+                                                      :Column(
+                                                                                  children: List.generate(
+                                                                                    achats.length,
+                                                                                    (i) => Card(
+                                                                                      margin: const EdgeInsets.all(10),
+                                                                                      child: ExpansionTile(
+                                                                                        backgroundColor:
+                                                                                            primaryColor.withOpacity(0.1),
+                                                                                        textColor: secondaryColor,
+                                                                                        childrenPadding: const EdgeInsets.all(10),
+                                                                                        leading: Column(
+                                                                                          children: [
+                                                                                            Text(achats[i].fournisseurName ?? ''),
+                                                                                            Text(achats[i].fournisseurPhone ?? ''),
+                                                                                          ],
+                                                                                        ),
+                                                                                        trailing: Column(
+                                                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                                                          crossAxisAlignment:
+                                                                                              CrossAxisAlignment.start,
+                                                                                          children: [
+                                                                                            Text(
+                                                                                              "Total =${achats[i].totalPrice} DZD",
+                                                                                              style: const TextStyle(
+                                                                                                  color: secondaryColor,
+                                                                                                  fontSize: 17,
+                                                                                                  fontWeight: FontWeight.bold),
+                                                                                            ),
+                                                                                            Text("Payer par: ${achats[i].userName}"),
+                                                                                          ],
+                                                                                        ),
+                                                                                        // subtitle:
+                                                                                        //     Text(achats[i].fournisseurPhone ?? ''),
+                                                                                        title: Row(
+                                                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                                                          children: [
+                                                                                            button('Versement', Icons.archive_outlined, (){},backgroundColor: Colors.green[600]),
+                                               const SizedBox(width: 20,),
+                                               button('Imprimer', Icons.print, (){
+
+                                               },backgroundColor: Colors.orange[800]),
+                                               const SizedBox(width: 20,),
+                                                                                            button('Archiver', Icons.archive_outlined, (){},),
+                                                                                            const SizedBox(width: 20,),
+                                                                                            button('Supprimer', Icons.archive_outlined, (){},backgroundColor: Colors.red),
+                                                                                            ],
+                                                                                        ),
+                                                                                        children: [
+                                                                                          SizedBox(
+                                                                                            child: DataTable(
+                                                                                                columns: const [
+                                                                                                  DataColumn(
+                                                                                                    label: Text(
+                                                                                                      "Nº Ref",
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      maxLines: 1,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  DataColumn(
+                                                                                                    label: Text(
+                                                                                                      "Nom",
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      maxLines: 1,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  DataColumn(
+                                                                                                    label: Text(
+                                                                                                      "Catégory",
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      maxLines: 1,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  DataColumn(
+                                                                                                    label: Text(
+                                                                                                      "Mark",
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      maxLines: 1,
+                                                                                                    ),
+                                                                                                  ),
+
+                                                                                                  DataColumn(
+                                                                                                    label: Text(
+                                                                                                      "Quantintée Acheté",
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      maxLines: 1,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  DataColumn(
+                                                                                                    label: Text(
+                                                                                                      "Prix",
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      maxLines: 1,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ],
+                                                                                                rows: List.generate(
+                                                                                                    achats[i].products.length,
+                                                                                                    (index) => myDataRow(
+                                                                                                        achats[i].products[index],
+                                                                                                        index))),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                );
+                                                }
                                               ),
-                                            ),
-                  )
-                ],
+                                            )
+                  ],
+                ),
               ),
             ));
   }
@@ -156,10 +280,8 @@ class _FournisseurDetailsState extends State<FournisseurDetails> {
     }
 
     DataRow myDataRow(Product product, int index) {
-      Color color = product.quantityInStock! <= product.minQuantity!
-          ? Colors.red.shade100
-          : (index % 2 == 0)
-              ? secondaryColor.withOpacity(0.1)
+      Color color = (index % 2 == 0)
+              ? primaryColor.withOpacity(0.1)
               : Colors.white54;
       return DataRow(color: MaterialStateProperty.all(color), cells: [
         DataCell(
@@ -186,14 +308,7 @@ class _FournisseurDetailsState extends State<FournisseurDetails> {
             showDetails(product);
           },
         ),
-        DataCell(
-          Text(product.createdAt != null
-              ? product.createdAt!.substring(0, 16)
-              : ''),
-          onTap: () {
-            showDetails(product);
-          },
-        ),
+
         DataCell(
           Text("${product.quantityInStock}"),
           onTap: () {
@@ -253,26 +368,4 @@ class _FournisseurDetailsState extends State<FournisseurDetails> {
         ),
       );
 
-  Widget button(String title, IconData icon, Function onPressed) =>
-        ElevatedButton.icon(
-          style: TextButton.styleFrom(
-            backgroundColor: primaryColor,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 15,
-            ),
-          ),
-          onPressed: () {
-            onPressed();
-          },
-          icon: Icon(
-            icon,
-            size: 20,
-            color: Colors.white,
-          ),
-          label: Text(
-            title,
-            style: const TextStyle(color: Colors.white),
-          ),
-        );
 }

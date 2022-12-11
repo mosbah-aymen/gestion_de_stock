@@ -15,6 +15,8 @@ class Product {
       category;
   List<String>? history=[];
 
+  bool? danger;
+
   int? unitPrice, quantityInStock, minQuantity,prixAchat,prixVente,nombreDesVente;
 
 
@@ -40,6 +42,7 @@ class Product {
     this.minQuantity,
     this.history,
     this.nombreDesVente,
+    this.danger=false,
     
   });
 }

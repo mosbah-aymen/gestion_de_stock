@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:gestion_de_stock/components/FormFieldCustom.dart';
 import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
+import 'package:gestion_de_stock/models/categorie.dart';
 import 'package:gestion_de_stock/models/user.dart';
 
 class AddProduct extends StatefulWidget {
@@ -23,17 +25,17 @@ class _AddProductState extends State<AddProduct> {
       stock = TextEditingController(),
       min = TextEditingController(),
       pVente = TextEditingController(),
-      category = TextEditingController(),
+      category = TextEditingController(text: ''),
       pAchat = TextEditingController();
   String fab = '', exp = '';
   @override
   void initState() {
     right = getRight();
     left = getLeft();
-if(widget.product!=null){
-  initProductToModify(widget.product!);
-
-}    super.initState();
+    if (widget.product != null) {
+      initProductToModify(widget.product!);
+    }
+    super.initState();
   }
 
   @override
@@ -43,8 +45,11 @@ if(widget.product!=null){
         header: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            button(widget.product==null?'Ajouter':'Modifier', widget.product==null?Icons.add:Icons.edit_note, () async{
-             await ajouterProduct();
+            button(widget.product == null ? 'Ajouter' : 'Modifier',
+                widget.product == null ? Icons.add : Icons.edit_note, () async {
+              await ajouterProduct().then((value) {
+                Navigator.pop(context);
+              });
             }),
             const Text(
               "Nouveau Produit",
@@ -93,6 +98,7 @@ if(widget.product!=null){
           title: 'Nom De Produit',
           child: TextFormField(
             controller: nom,
+            textAlign: TextAlign.center,
             decoration: decoration('Nom De Produit'),
           ),
         ),
@@ -100,12 +106,14 @@ if(widget.product!=null){
           title: 'Mark De Produit',
           child: TextFormField(
             controller: mark,
+            textAlign: TextAlign.center,
             decoration: decoration('Nom De Produit'),
           ),
         ),
         FieldNewPackageForm(
           title: "Prix D'Achat",
           child: TextFormField(
+            textAlign: TextAlign.center,
             controller: pAchat,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp('[0-9]')),
@@ -117,41 +125,43 @@ if(widget.product!=null){
           title: "Quantity En Stock",
           child: TextFormField(
             controller: stock,
+            textAlign: TextAlign.center,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp('[0-9]')),
             ],
             decoration: decoration("Prix De Vente"),
           ),
         ),
-    StatefulBuilder(
-      builder: (context,setState) {
-        return FieldNewPackageForm(
-                  title: 'Date De Fabrication',
-                  onPressed: ()async{
-                  await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(3000),).then((value) {
-                    print(value);
-                     if(value!=null){
-                                    fab=value.toString().substring(0,10);
-                                  }
-                     else{
-                       fab='/';
-                     }
-                    setState((){});
-
-                   });
-                  },
-                  child: Center(
-                    child: Text(
-                                           fab.isEmpty?"Voir Le Calendier":fab,
-                                            style: const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                  ),
-                );
-      }
-    ),
+        StatefulBuilder(builder: (context, setState) {
+          return FieldNewPackageForm(
+            title: 'Date De Fabrication',
+            onPressed: () async {
+              await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(3000),
+              ).then((value) {
+                print(value);
+                if (value != null) {
+                  fab = value.toString().substring(0, 10);
+                } else {
+                  fab = '/';
+                }
+                setState(() {});
+              });
+            },
+            child: Center(
+              child: Text(
+                fab.isEmpty ? "Voir Le Calendier" : fab,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          );
+        }),
         FieldNewPackageForm(
           title: 'Description',
           height: 100,
@@ -166,87 +176,78 @@ if(widget.product!=null){
           title: 'Refference De Produit',
           child: TextFormField(
             controller: ref,
+            textAlign: TextAlign.center,
             decoration: decoration('Refference De Produit'),
           ),
         ),
         StatefulBuilder(builder: (context, setState) {
-          return FieldNewPackageForm(
-            title: "Category",
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  PopupMenuButton(
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      child: Text(
-                        category.text.isEmpty
-                            ? 'Clicker Pour Voir La List'
-                            : category.text,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    itemBuilder: (context) => List.generate(
-                      categories.length,
-                      (index) => PopupMenuItem(
-                        child: Expanded(child: Text(categories[index])),
-                        onTap: () {
-                          category.text = categories[index];
-                          print(category.text);
-                          setState(() {});
-                        },
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  content: FieldNewPackageForm(
-                                    title: "Nouveau Category",
-                                    child: TextFormField(
-                                      controller: category,
-                                      decoration:
-                                          decoration('Nouveau Category'),
+          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('categories')
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                categories.clear();
+                if (snapshot.hasData) {
+                  for (var value in snapshot.data!.docs) {
+                    categories
+                        .add(CategoryCrtl.fromJSON(value.data(), value.id));
+                  }
+                }
+                return !snapshot.hasData
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : FieldNewPackageForm(
+                        title: "Category",
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              PopupMenuButton(
+                                child: Container(
+                                  margin: const EdgeInsets.all(10),
+                                  child: Text(
+                                    category.text.isEmpty
+                                        ? 'Clicker Pour Voir La List'
+                                        : category.text,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
                                     ),
                                   ),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () {
-                                          if (categories
-                                              .contains(category.text)) {
-                                            Navigator.pop(context);
-                                          } else {
-                                            categories.add(category.text);
-                                            setState(() {});
-                                            Navigator.pop(context);
-                                          }
-                                        },
-                                        child: const Text(
-                                            'Ajouter et Sauvegarder')),
-                                    TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text('Annuler')),
-                                  ],
-                                ));
-                      },
-                      child: const Text('Ajouter Category'))
-                ],
-              ),
-            ),
-          );
+                                ),
+                                itemBuilder: (context) => List.generate(
+                                  categories.length,
+                                  (index) => PopupMenuItem(
+                                    child: ListTile(
+                                        leading: Icon(
+                                          Icons.radio_button_checked,
+                                          color:
+                                              Color(categories[index].color!),
+                                        ),
+                                        title: Text(
+                                            categories[index].name.toString())),
+                                    onTap: () {
+                                      category.text =
+                                          categories[index].name ?? '';
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+              });
         }),
         FieldNewPackageForm(
           title: "Prix De Vente",
           child: TextFormField(
             controller: pVente,
+            textAlign: TextAlign.center,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp('[0-9]')),
             ],
@@ -257,41 +258,43 @@ if(widget.product!=null){
           title: "Quantity Minimal",
           child: TextFormField(
             controller: min,
+            textAlign: TextAlign.center,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp('[0-9]')),
             ],
             decoration: decoration("Quantity Minimal"),
           ),
         ),
-    StatefulBuilder(
-          builder: (context,setState) {
-            return FieldNewPackageForm(
-                      title: "Date D'Expiration",
-                      onPressed: ()async{
-                      await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(3000),).then((value) {
-                        print(value);
-                         if(value!=null){
-                                        exp=value.toString().substring(0,10);
-                                      }
-                         else{
-                           exp='/';
-                         }
-                        setState((){});
-
-                       });
-                      },
-                      child: Center(
-                        child: Text(
-                                               exp.isEmpty?"Voir Le Calendier":exp,
-                                                style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                      ),
-                    );
-          }
-        ),
+        StatefulBuilder(builder: (context, setState) {
+          return FieldNewPackageForm(
+            title: "Date D'Expiration",
+            onPressed: () async {
+              await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(3000),
+              ).then((value) {
+                print(value);
+                if (value != null) {
+                  exp = value.toString().substring(0, 10);
+                } else {
+                  exp = '/';
+                }
+                setState(() {});
+              });
+            },
+            child: Center(
+              child: Text(
+                exp.isEmpty ? "Voir Le Calendier" : exp,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          );
+        }),
       ];
 
   bool allVerified() {
@@ -311,7 +314,7 @@ if(widget.product!=null){
     mark.text = product.mark ?? '';
     min.text = product.minQuantity.toString();
     pAchat.text = product.prixAchat.toString();
-    pVente.text=product.prixVente.toString();
+    pVente.text = product.prixVente.toString();
     stock.text = product.quantityInStock.toString();
     description.text = product.description ?? '';
     category.text = product.category ?? '';
@@ -319,10 +322,11 @@ if(widget.product!=null){
     exp = product.expDate ?? '/';
   }
 
- Future ajouterProduct()async{
-    if(allVerified()){
-      Product product=Product(
+  Future ajouterProduct() async {
+    if (allVerified()) {
+      Product product = Product(
         nom: nom.text,
+        id: widget.product == null ? null : widget.product!.id,
         ref: ref.text,
         mark: mark.text,
         category: category.text,
@@ -332,20 +336,22 @@ if(widget.product!=null){
         prixAchat: int.tryParse(pAchat.text),
         prixVente: int.tryParse(pAchat.text),
         description: description.text,
-        createdAt: DateTime.now().toString(),
-        updatedAt:  DateTime.now().toString(),
+        createdAt: widget.product == null
+            ? DateTime.now().toString()
+            : widget.product!.createdAt,
+        updatedAt: DateTime.now().toString(),
         addedBy: currentUser.name,
         history: ['Ajouté par ${currentUser.name} '],
         fabDate: fab,
         expDate: exp,
       );
-      print(product.toString());
       await ProductCrtl.addProduct(product);
-      print(product.toString());
-
-    }
-    else{
-      showDialog(context: context, builder: (context)=>const AlertDialog(content: Text("Merci De Verifier Les Information Obligatoire"),));
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) => const AlertDialog(
+                content: Text("Merci De Verifier Les Information Obligatoire"),
+              ));
     }
   }
 

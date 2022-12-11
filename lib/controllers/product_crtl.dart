@@ -6,6 +6,7 @@ class ProductCrtl{
   static Map<String,dynamic> toJSON(Product product){
     return {
       'nom':product.nom??'',
+      'id':product.id,
       'createdAt':product.createdAt??'',
       'updatedAt':product.updatedAt??'',
       'description':product.description??'',
@@ -25,6 +26,7 @@ class ProductCrtl{
       'history':product.history??[],
       'minQuantity':product.minQuantity??0,
       'unitPrice':product.unitPrice??0,
+      'danger':product.danger??false,
     };
   }
 
@@ -51,20 +53,44 @@ class ProductCrtl{
       description: data['description']??'',
       updatedAt: data['updatedAt']??'',
       id: id,
+      danger: data['danger']??false,
     );
   }
 
   static Future addProduct(Product product)async{
     String err='';
     try {
-      print('inside');
-      await FirebaseFirestore.instance.collection('products').doc().set(
-          ProductCrtl.toJSON(product));
-
+        await FirebaseFirestore.instance.collection('products').doc(product.id).set(
+                  ProductCrtl.toJSON(product));
     }
     catch(e){
       print(err);
       print(e);
     }
   }
+
+  static List<Map<String,dynamic>> listToJSON(List<Product> products){
+    List<Map<String,dynamic>> tmp=[];
+    for (var value in products) {
+      tmp.add(toJSON(value));
+    }
+    return tmp;
+  }
+  static List<Product> jsonToList(List<Map<String,dynamic>> json){
+    List<Product>tmp=[];
+    for (var value in json) {
+      tmp.add(fromJSON(value, value['id']));
+    }
+    return tmp;
+  }
+
+  static Future modifyQuantities(List<Product> products,List<int> qts)async{
+    CollectionReference<Map<String, dynamic>> col= FirebaseFirestore.instance.collection('products');
+    for (int i=0;i<qts.length;i++) {
+      col.doc(products[i].id).update({
+        'quantityInStock':qts[i],
+      });
+    }
+  }
+
 }

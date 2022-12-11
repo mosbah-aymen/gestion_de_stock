@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gestion_de_stock/imports.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -9,6 +10,9 @@ class ProductDetails extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetails> {
+  Future deleteProducts() async {
+    await FirebaseFirestore.instance.doc("/products/${widget.product.id}").delete();
+   }
   @override
   Widget build(BuildContext context) {
     final Size _size = MediaQuery.of(context).size;
@@ -94,7 +98,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               thickness: 1,
                             ),
                             productDetails(
-                                'Quantité En Stock ',
+                                'Quantité ',
                                 widget.product.quantityInStock.toString() ),
                             productDetails('Quantité Minimal ',
                                 widget.product.minQuantity.toString() ),
@@ -105,6 +109,43 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 "${widget.product.quantityInStock! *
                                             widget.product.unitPrice!}   DZD" ,
                             color: secondaryColor),
+                            SizedBox(
+                              height: 100,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  button('Supprimer', Icons.delete, () async {
+
+                                                await showDialog(
+                                                    context: context,
+                                                    builder: (context) => AlertDialog(
+                                                          title: const Text('Attention'),
+                                                          content: const Text(
+                                                              'Voulez vous vraiment Supprimer tous les produit selectionnés'),
+                                                          actions: [
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(context);
+                                                                },
+                                                                child: const Text('Annuler')),
+                                                            TextButton(
+                                                                onPressed: () async {
+                                                                  await deleteProducts().then((value) {
+                                                                    Navigator.pop(context);
+                                                                  });
+                                                                },
+                                                                child: const Text('Supprimer')),
+                                                          ],
+                                                        )).then((value) {
+                                                  setState(() {});
+                                                });
+
+                                            },
+                                 backgroundColor: Colors.red ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -209,26 +250,5 @@ class _ProductDetailsState extends State<ProductDetails> {
           ),
         ),
       );
-  Widget button(String title, IconData icon, Function onPressed) =>
-      ElevatedButton.icon(
-        style: TextButton.styleFrom(
-          backgroundColor: primaryColor,
-          padding:const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 15,
-          ),
-        ),
-        onPressed: () {
-          onPressed();
-        },
-        icon: Icon(
-          icon,
-          size: 20,
-          color: Colors.white,
-        ),
-        label: Text(
-          title,
-          style: TextStyle(color: Colors.white),
-        ),
-      );
+
 }

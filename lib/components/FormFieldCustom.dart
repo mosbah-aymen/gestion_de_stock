@@ -4,6 +4,7 @@ class FieldNewPackageForm extends StatelessWidget {
   final String title;
   final Widget? child;
   final double? height;
+  final Color? textColor,borderColor;
   final Function()? onPressed;
   const FieldNewPackageForm(
       {Key? key,
@@ -11,6 +12,8 @@ class FieldNewPackageForm extends StatelessWidget {
       required this.title,
       this.child,
       this.height,
+        this.textColor,
+        this.borderColor,
       this.onPressed})
       : super(key: key);
 
@@ -24,19 +27,20 @@ class FieldNewPackageForm extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
+            style:  TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.bold,
+              color: textColor,
             ),
           ),
         ),
         GestureDetector(
           onTap: onPressed,
           child: Container(
-            height: height ?? 60,
+            height: height ?? 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey, width: 1),
+              border: Border.all(color: borderColor??Colors.grey, width: 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -48,7 +52,7 @@ class FieldNewPackageForm extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(
                     icon,
-                    color: primaryColor,
+                    color:borderColor??primaryColor,
                   ),
                 ):const SizedBox(),
                 Expanded(child: child ?? const SizedBox()),

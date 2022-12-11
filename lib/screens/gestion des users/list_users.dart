@@ -1,7 +1,7 @@
 import 'package:gestion_de_stock/imports.dart';
 
 class ListUsers extends StatefulWidget {
-  static const String id = 'List Users';
+  static const String id = 'Gestion Des Utilisateur';
 
   const ListUsers({Key? key}) : super(key: key);
 

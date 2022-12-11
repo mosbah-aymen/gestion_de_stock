@@ -1,50 +1,58 @@
 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gestion_de_stock/components/search_field.dart';
-import 'package:gestion_de_stock/controllers/vente_crtl.dart';
+import 'package:gestion_de_stock/controllers/achat_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
-import 'package:gestion_de_stock/models/vente.dart';
+import 'package:gestion_de_stock/models/achat.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
-import 'package:gestion_de_stock/components/workspace.dart';
-class ListSorties extends StatefulWidget {
-  static const String id = 'Gestion Des Ventes';
-  const ListSorties({Key? key}) : super(key: key);
+
+class ArchiveAchat extends StatefulWidget {
+  const ArchiveAchat({Key? key}) : super(key: key);
 
   @override
-  State<ListSorties> createState() => _ListSortiesState();
+  State<ArchiveAchat> createState() => _ArchiveAchatState();
 }
 
-class _ListSortiesState extends State<ListSorties> {
-  String search='';
-List<Vente> selectedCommands=[],ventes=[];
+class _ArchiveAchatState extends State<ArchiveAchat> {
+  List<Achat> achats = [];
 
+  bool paid=false;
   @override
   Widget build(BuildContext context) {
-    return WorkSpace(headChildren: const [],
-      searchBar: Card(
-         margin: const EdgeInsets.all(10),
-         child: SearchField(
-             hint: 'Chercher ce que voulez ...',
-             onSubmitted: (s) {
-               search = s.toLowerCase();
-               setState(() {});
-             }),
-       ),
-      child: SingleChildScrollView(
+    return  Window(
+      header: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+             children: [
+               button('Tous Désarchiver', Icons.all_inbox, ()async{
+                 for (var value in achats) {
+                   AchatCrtl.archiverAchat(value, false);
+                 }
+                 Navigator.pop(context);
+               }),
+               const Text("Archive Des Achats",
+               style: TextStyle(
+                 color: Colors.white,
+                 fontWeight: FontWeight.bold,
+
+               ),),
+               button('Exit', Icons.cancel, (){Navigator.pop(context);})
+             ],
+             ),
+      body: SingleChildScrollView(
               child: SizedBox(
                 child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                     stream: FirebaseFirestore.instance
-                        .collection('ventes')
-                    .where('archived',isEqualTo: false)
-                        // .orderBy('createdAt', descending: true)
+                        .collection('achats')
+                    .where('archived',isEqualTo: true)
+                        .orderBy('createdAt', descending: true)
                         .limit(20)
                         .snapshots(),
                     builder: (context, snapshot) {
-                      ventes.clear();
+                      achats.clear();
                       if (snapshot.hasData) {
                         for (var value in snapshot.data!.docs) {
-                          ventes.add(VenteCrtl.fromJSON(value.data(), value.id));
-                          // FirebaseFirestore.instance.collection('ventes').doc(value.id).update({
+                          achats.add(AchatCrtl.fromJSON(value.data(), value.id));
+                          // FirebaseFirestore.instance.collection('achats').doc(value.id).update({
                           //   'archived':false,
                           // });
                         }
@@ -59,7 +67,8 @@ List<Vente> selectedCommands=[],ventes=[];
                                 )
                               : Column(
                                   children: List.generate(
-                                    ventes.length,
+                                    achats
+                                        .length,
                                     (i) => Card(
                                       margin: const EdgeInsets.all(10),
                                       child: ExpansionTile(
@@ -69,60 +78,43 @@ List<Vente> selectedCommands=[],ventes=[];
                                         childrenPadding: const EdgeInsets.all(10),
                                         leading: Column(
                                           children: [
-                                            Text(ventes[i].clientName??''),
-                                            Text(ventes[i].phone1 ?? ventes[i].phone1 ??'-'),
+                                            Text(achats[i].fournisseurName ?? ''),
+                                            Text(achats[i].fournisseurPhone ?? ''),
                                           ],
                                         ),
-                                        trailing: SizedBox(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Total =${ventes[i].totalPrice} DZD",
-                                                style: const TextStyle(
-                                                    color: secondaryColor,
-                                                    fontSize: 17,
-                                                    fontWeight: FontWeight.bold),
-                                              ),
-                                              Text("Payer par: ${ventes[i].userName}"),
-                                            ],
-                                          ),
+                                        trailing: Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Total =${achats[i].totalPrice} DZD",
+                                              style: const TextStyle(
+                                                  color: secondaryColor,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text("Payer par: ${achats[i].userName}"),
+                                          ],
                                         ),
                                         // subtitle:
-                                        //     Text(ventes[i].fournisseurPhone ?? ''),
-                                        title: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              button('Versement', Icons.archive_outlined, (){},backgroundColor: Colors.green[600]),
-                                              const SizedBox(width: 20,),
-                                              button('Imprimer', Icons.print, (){
+                                        //     Text(achats[i].fournisseurPhone ?? ''),
+                                        title: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            button('Versement', Icons.archive_outlined, (){},backgroundColor: Colors.green[600]),
+                                                                                        const SizedBox(width: 20,),
+                                                                                        button('Imprimer', Icons.print, (){
 
-                                              },backgroundColor: Colors.orange[800]),
-                                              const SizedBox(width: 20,),
-                                              button('Archiver', Icons.archive_outlined, ()async{
-                                                await VenteCrtl.archiverVente(ventes[i],true);
-                                              },
-                                              backgroundColor: Colors.blue,
-                                              ),
-                                              const SizedBox(width: 20,),
-                                              button('Supprimer', Icons.archive_outlined, (){
-                                                showDialog(context: context, builder: (context)=>AlertDialog(
-                                                  title: const Text('Voulez vous vraiment Supprimer cette vente totalement'),
-                                                  actions: [
-                                                    TextButton(onPressed: (){
-                                                      FirebaseFirestore.instance.collection('ventes').doc(ventes[i].id).delete();
-                                                      Navigator.pop(context);
-                                                    }, child: const Text('Supprimer')),
-                                                    TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('Annuler')),
-                                                  ],
-                                                ));
-                                              },backgroundColor: Colors.red),
+                                                                                        },backgroundColor: Colors.orange[800]),
+                                                                                        const SizedBox(width: 20,),
+                                            button('Désarchiver', Icons.archive_outlined, ()async{
+                                              await AchatCrtl.archiverAchat(achats[i],false);
+                                            },),
+                                            const SizedBox(width: 20,),
+                                            button('Supprimer', Icons.archive_outlined, (){},backgroundColor: Colors.red),
                                             ],
-                                          ),
                                         ),
                                         children: [
                                           SizedBox(
@@ -156,10 +148,16 @@ List<Vente> selectedCommands=[],ventes=[];
                                                       maxLines: 1,
                                                     ),
                                                   ),
-
                                                   DataColumn(
                                                     label: Text(
-                                                      "Quantintée Vendu",
+                                                      "Entrée en",
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
+                                                  ),
+                                                  DataColumn(
+                                                    label: Text(
+                                                      "Quantintée",
                                                       overflow: TextOverflow.ellipsis,
                                                       maxLines: 1,
                                                     ),
@@ -173,9 +171,9 @@ List<Vente> selectedCommands=[],ventes=[];
                                                   ),
                                                 ],
                                                 rows: List.generate(
-                                                    ventes[i].products!.length,
+                                                    achats[i].products.length,
                                                     (index) => myDataRow(
-                                                        ventes[i].products![index],
+                                                        achats[i].products[index],
                                                         index))),
                                           )
                                         ],
@@ -188,18 +186,14 @@ List<Vente> selectedCommands=[],ventes=[];
             ),
     );
   }
-  bool conditions(Vente command){
-    return command.id!.contains(search)||
-    command.clientName!.toLowerCase().startsWith(search)||
-        command.userName!.toLowerCase().startsWith(search);}
-
   void showDetails(Product product) {
-      showDialog(
-          context: context,
-          builder: (context) => ProductDetails(
-                product: product,
-              ));
-    }
+    showDialog(
+        context: context,
+        builder: (context) => ProductDetails(
+              product: product,
+            ));
+  }
+
   DataRow myDataRow(Product product, int index) {
     Color color =
         (index % 2 == 0) ? primaryColor.withOpacity(0.1) : Colors.white54;
@@ -229,6 +223,14 @@ List<Vente> selectedCommands=[],ventes=[];
         },
       ),
       DataCell(
+        Text(product.createdAt != null
+            ? product.createdAt!.substring(0, 16)
+            : ''),
+        onTap: () {
+          showDetails(product);
+        },
+      ),
+      DataCell(
         Text("${product.quantityInStock}"),
         onTap: () {
           showDetails(product);
@@ -242,6 +244,4 @@ List<Vente> selectedCommands=[],ventes=[];
       ),
     ]);
   }
-
 }
-

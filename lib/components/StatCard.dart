@@ -9,7 +9,7 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
                                   color:color?? secondaryColor,
-                                  margin: EdgeInsets.all(8),
+                                  margin: const EdgeInsets.all(8),
                                   elevation: 4,
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -32,7 +32,7 @@ class StatCard extends StatelessWidget {
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
+                                                  fontSize: 15
                                                 ),
                                                 maxLines: 2,
                                                 textAlign: TextAlign.center,

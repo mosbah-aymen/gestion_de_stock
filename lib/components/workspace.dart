@@ -16,14 +16,15 @@ class WorkSpace extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       child: Column(
         children: [
-          statTitles!=null && statValues!=null? Row(
-            children: List.generate(statTitles!.length, (index) => Expanded(child: StatCard(value: statValues![index], title: statTitles![index], unit: ''))),
-          ):const SizedBox(),
           searchBar ?? const SizedBox(),
+          statTitles!=null && statValues!=null? Row(
+            children: List<Widget>.generate(statTitles!.length, (index) => Expanded(child: StatCard(value: statValues![index], title: statTitles![index], unit: ''),),
+            ),
+          ):const SizedBox(),
           headChildren.isNotEmpty
               ? Expanded(
                   child: Row(
-                    children: List.generate(
+                    children: List<Widget>.generate(
                         headChildren.length, (index) => headChildren[index]),
                   ),
                 )
@@ -57,22 +58,24 @@ class HeaderElement extends StatelessWidget {
         child: Card(
           elevation: 0,
           color: color??secondaryColor,
+          margin: const EdgeInsets.all(8),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(
                   icon ?? Icons.circle_outlined,
                   color: iconColor ?? Colors.white,
-                  size: 30,
                 ),
                 const SizedBox(
                   width: 10,
                 ),
                 Text(
                   title,
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 18,overflow: TextOverflow.ellipsis),
                 ),
               ],
             ),

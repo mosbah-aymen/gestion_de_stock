@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gestion_de_stock/components/search_field.dart';
+import 'package:gestion_de_stock/controllers/fournisseur_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/fourniseur.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20fourniseurs/add_fournisseur.dart';
@@ -7,7 +9,7 @@ import 'package:gestion_de_stock/screens/gestion%20des%20produits/add_product.da
 import 'package:gestion_de_stock/components/workspace.dart';
 
 class ListFournisseur extends StatefulWidget {
-  static const String id = 'List Fournisseurs';
+  static const String id = 'Gestion Des Fournisseurs';
   const ListFournisseur({Key? key}) : super(key: key);
 
   @override
@@ -46,7 +48,21 @@ if(selectedIndex!=-1){
               icon: Icons.edit_note,),
           HeaderElement(title: 'Supprimer',
             color: selectedIndex>-1?null: Colors.black54,
-                    onTap: (){},
+                    onTap: (){
+            showDialog(context: context, builder: (context)=>AlertDialog(
+              title: Text("Attention"),
+              content: Text("Voulez vous vraiment supprimer ce fournisseur?"),
+              actions: [
+                TextButton(onPressed: ()async{
+                  await FournisseurCrtl.deleteFournisseur(fournisseurs[selectedIndex]).then((value) {
+                    Navigator.pop(context);
+                    selectedIndex=-1;
+                  });
+                }, child: const Text("Supprimer")),
+                TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('Annuler'))
+              ],
+            ));
+                    },
                     icon: Icons.delete,),
 
     ],
@@ -57,74 +73,91 @@ if(selectedIndex!=-1){
                   setState(() {});
                 }),
 
-    child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                  dividerThickness: 2,
-                  columns: const [
-                    DataColumn(
-                      label: Text(
-                        "Nom",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        "Prénom",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
+    child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection('fournisseur').orderBy('createdAt',descending: true).snapshots(),
+      builder: (context, snapshot) {
+        fournisseurs.clear();
+        if(snapshot.hasData){
+          for (var value in snapshot.data!.docs) {
+            fournisseurs.add(FournisseurCrtl.fromJSON(value.data(), value.id));
+          }
+        }
+        return !snapshot.hasData?
+            const Center(child: CircularProgressIndicator(),)
+            :ScrollConfiguration(
+          behavior: MyCustomScrollBehavior(),
+          child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: DataTable(
+                        dividerThickness: 2,
+                        dataRowHeight: 30,
+                        columns: const [
+                          DataColumn(
+                            label: Text(
+                              "Nom",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              "Prénom",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
 
-                    DataColumn(
-                      label: Text(
-                        "Téléphone1",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    DataColumn(
-                                        label: Text(
-                                          "Téléphone2",
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                    DataColumn(
-                                         label: Text(
-                                           "Wilaya",
-                                           overflow: TextOverflow.ellipsis,
-                                           maxLines: 1,
-                                         ),
-                                       ),
-                    DataColumn(
-                      label: Text(
-                        "Commune",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        "Entrée en",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
+                          DataColumn(
+                            label: Text(
+                              "Téléphone1",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          DataColumn(
+                                              label: Text(
+                                                "Téléphone2",
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                          DataColumn(
+                                               label: Text(
+                                                 "Wilaya",
+                                                 overflow: TextOverflow.ellipsis,
+                                                 maxLines: 1,
+                                               ),
+                                             ),
+                          DataColumn(
+                            label: Text(
+                              "Commune",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              "Entrée en",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
 
-                  ],
-                  rows: List.generate(
-                      fournisseurs.where((element) => conditions(element)).length,
-                      (index) => myDataRow(
-                          fournisseurs
-                              .where((element) => conditions(element))
-                              .elementAt(index),
-                          index))),
-            ),
-          ),
+                        ],
+                        rows: List.generate(
+                            fournisseurs.where((element) => conditions(element)).length,
+                            (index) => myDataRow(
+                                fournisseurs
+                                    .where((element) => conditions(element))
+                                    .elementAt(index),
+                                index))),
+                  ),
+                ),
+        );
+      }
+    ),
     );
   }
   bool conditions(Fournisseur element) {
@@ -136,7 +169,7 @@ if(selectedIndex!=-1){
   }
   DataRow myDataRow(Fournisseur fournisseur, int index) {
     Color color = (index % 2 == 0)
-            ? secondaryColor.withOpacity(0.1)
+            ? primaryColor.withOpacity(0.1)
             : Colors.white54;
     return DataRow(
         onSelectChanged: (b){

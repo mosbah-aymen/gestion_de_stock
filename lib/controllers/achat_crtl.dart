@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gestion_de_stock/controllers/fournisseur_crtl.dart';
 import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
 
@@ -44,11 +45,17 @@ class AchatCrtl{
     await FirebaseFirestore.instance.collection('achats').doc(achat.id).set(
       toJSON(achat),
     );
+    await FournisseurCrtl.makeAchat(achat);
   }
+
 
   static Future archiverAchat(Achat achat,bool archiver)async{
     await FirebaseFirestore.instance.collection('achats').doc(achat.id).update({
       'archived':archiver,
     });
+  }
+
+  static Future delete(Achat achat)async {
+    await FirebaseFirestore.instance.collection('achats').doc(achat.id).delete();
   }
 }

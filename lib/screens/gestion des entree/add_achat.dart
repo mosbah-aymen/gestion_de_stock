@@ -1,12 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:gestion_de_stock/components/FormFieldCustom.dart';
 import 'package:gestion_de_stock/controllers/achat_crtl.dart';
+import 'package:gestion_de_stock/controllers/fournisseur_crtl.dart';
 import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/achat.dart';
 import 'package:gestion_de_stock/models/fourniseur.dart';
 import 'package:gestion_de_stock/models/user.dart';
-import 'package:gestion_de_stock/screens/gestion%20des%20produits/add_product.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
 
 class AddAchat extends StatefulWidget {
@@ -19,10 +20,10 @@ class AddAchat extends StatefulWidget {
 
 class _AddAchatState extends State<AddAchat> {
   Fournisseur? fournisseur;
-  TextEditingController? verse = TextEditingController(text: '0'),
+  TextEditingController? verseCrtl = TextEditingController(text: '0'),
       rest = TextEditingController(text: '0'),
       description = TextEditingController(text: '');
-  int total = 0, versed = 0, reste = 0;
+  int total = 0, verse = 0, reste = 0;
   List<int> qty = [];
   void calculeTotal() {
     total = 0;
@@ -86,7 +87,7 @@ class _AddAchatState extends State<AddAchat> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)
                 ),
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     Expanded(
@@ -98,61 +99,75 @@ class _AddAchatState extends State<AddAchat> {
                           title: 'Fournisseur',
                           child: Padding(
                             padding: const EdgeInsets.only(left: 10),
-                            child: PopupMenuButton(
-                              child: Center(
-                                child: Row(
-                                  children: [
-                                    const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 8.0),
-                                      child: Icon(
-                                        Icons.account_circle,
-                                        color: Colors.white,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        fournisseur == null
-                                            ? 'Selectionner le fournisseur'
-                                            : '${fournisseur!.nom!} ${fournisseur!.prenom!}',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              itemBuilder: (context) => List.generate(
-                                exampleFournisseurs.length,
-                                (index) => PopupMenuItem(
-                                  onTap: () {
-                                    fournisseur = exampleFournisseurs[index];
-                                    setState(() {});
-                                  },
-                                  child: ListTile(
-                                    leading: const Icon(
-                                      Icons.account_circle,
-                                      color: primaryColor,
-                                      size: 30,
-                                    ),
-                                    title: Text(
-                                      '${exampleFournisseurs[index].nom!} ${exampleFournisseurs[index].prenom!}',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    subtitle: Column(
+                            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance.collection('fournisseur').snapshots(),
+                              builder: (context, snapshot) {
+                                exampleFournisseurs.clear();
+                                if(snapshot.hasData){
+                                  for (var value in snapshot.data!.docs) {
+                                    exampleFournisseurs.add(FournisseurCrtl.fromJSON(value.data(), value.id));
+                                  }
+                                  fournisseur ??= exampleFournisseurs.first;
+                                }
+                                return !snapshot.hasData?
+                                    const Center(child: CircularProgressIndicator(),)
+                                  :PopupMenuButton(
+                                  child: Center(
+                                    child: Row(
                                       children: [
-                                        Text(
-                                            '${exampleFournisseurs[index].phone1}'),
-                                        Text(
-                                            '${exampleFournisseurs[index].commune!} ${exampleFournisseurs[index].wilaya!}'),
+                                        const Padding(
+                                          padding:
+                                              EdgeInsets.symmetric(horizontal: 8.0),
+                                          child: Icon(
+                                            Icons.account_circle,
+                                            color: Colors.white,
+                                            size: 30,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            fournisseur == null
+                                                ? 'Selectionner le fournisseur'
+                                                : '${fournisseur!.nom!} ${fournisseur!.prenom!} ${fournisseur!.id!}',
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
-                                ),
-                              ),
+                                  itemBuilder: (context) => List.generate(
+                                    exampleFournisseurs.length,
+                                    (index) => PopupMenuItem(
+                                      onTap: () {
+                                        fournisseur = exampleFournisseurs[index];
+                                        setState(() {});
+                                      },
+                                      child: ListTile(
+                                        leading: const Icon(
+                                          Icons.account_circle,
+                                          color: primaryColor,
+                                          size: 30,
+                                        ),
+                                        title: Text(
+                                          '${exampleFournisseurs[index].nom!} ${exampleFournisseurs[index].prenom!}',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        subtitle: Column(
+                                          children: [
+                                            Text(
+                                                '${exampleFournisseurs[index].phone1}'),
+                                            Text(
+                                                '${exampleFournisseurs[index].commune!} ${exampleFournisseurs[index].wilaya!}'),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
                             ),
                           ),
                         ),
@@ -166,7 +181,7 @@ class _AddAchatState extends State<AddAchat> {
                             borderColor: Colors.white,
                             title: 'Verser',
                             child: TextFormField(
-                              controller: verse,
+                              controller: verseCrtl,
                               onChanged: (s) {
                                 setState(() {
                                   reste = total - (int.tryParse(s) ?? 0);
@@ -177,7 +192,7 @@ class _AddAchatState extends State<AddAchat> {
                                     RegExp('[0-9]')),
                               ],
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                               decoration: decoration('', prefix: 'DZD',prefixColor: Colors.white),
                             )),
                       ),
@@ -197,7 +212,7 @@ class _AddAchatState extends State<AddAchat> {
                               ],
                               controller: TextEditingController(text: '$reste'),
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                               decoration: decoration('', prefix: 'DZD',prefixColor: Colors.white),
                             )),
                       ),
@@ -481,7 +496,7 @@ class _AddAchatState extends State<AddAchat> {
         products: widget.selectedProducts,
         rest: reste,
         totalPrice: total,
-        verse: versed,
+        verse: verse,
         fournisseurId: fournisseur!.id,
         fournisseurPhone: fournisseur!.phone1,
         fournisseurName: fournisseur!.nom,

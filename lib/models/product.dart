@@ -12,12 +12,13 @@ class Product {
       fabDate,
       expDate,
   description,
+  magasinId,magasinName,
       category;
   List<String>? history=[];
 
   bool? danger;
 
-  int? unitPrice, quantityInStock, minQuantity,prixAchat,prixVente,nombreDesVente;
+  int? unitPrice, quantityInStock, minQuantity,prixAchat,prixVente,nombreDesVente,categoryColor;
 
 
   Product({
@@ -42,6 +43,9 @@ class Product {
     this.minQuantity,
     this.history,
     this.nombreDesVente,
+     this.categoryColor,
+    this.magasinId,
+    this.magasinName,
     this.danger=false,
     
   });

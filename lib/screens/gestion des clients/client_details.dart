@@ -73,9 +73,9 @@ class _ClientDetailsState extends State<ClientDetails> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 StatCard(value: widget.client.totalCommandes!.toStringAsFixed(0), title: 'Total Commandes', unit: "CMD"),
-                                StatCard(value: widget.client.versed!.toStringAsFixed(0), title: 'Versé', unit: "DZD"),
+                                StatCard(value: widget.client.verse!.toStringAsFixed(0), title: 'Versé', unit: "DZD"),
                                 StatCard(value: widget.client.rest!.toStringAsFixed(0), title: 'Resté', unit: "DZD"),
-                                StatCard(value: (widget.client.versed!+widget.client.rest!).toStringAsFixed(0), title: 'Total', unit: "DZD"),
+                                StatCard(value: (widget.client.verse!+widget.client.rest!).toStringAsFixed(0), title: 'Total', unit: "DZD"),
                             ],))
                           ],
                         ),

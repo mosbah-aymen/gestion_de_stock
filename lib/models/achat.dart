@@ -10,7 +10,7 @@ class Achat {
       userName,
       userId;
   List<Product> products = [];
-  int? totalPrice, verse, rest;
+  int? totalNet,remise,tva,ttc,timbre,autreTaxe, verse, rest,totalPrice;
 
   Achat(
       {this.id,
@@ -24,7 +24,13 @@ class Achat {
       this.verse = 0,
       this.rest = 0,
       required this.products,
-      this.totalPrice});
+      this.totalPrice,
+      this.autreTaxe,
+      this.remise,
+        this.timbre,
+        this.totalNet,
+        this.ttc,this.tva,
+      });
 }
 
 List<Achat> exampleAchat = [];

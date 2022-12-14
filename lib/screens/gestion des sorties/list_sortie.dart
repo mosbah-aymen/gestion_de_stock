@@ -67,11 +67,17 @@ List<Vente> selectedCommands=[],ventes=[];
                                             primaryColor.withOpacity(0.1),
                                         textColor: secondaryColor,
                                         childrenPadding: const EdgeInsets.all(10),
-                                        leading: Column(
-                                          children: [
-                                            Text(ventes[i].clientName??''),
-                                            Text(ventes[i].phone1 ?? ventes[i].phone1 ??'-'),
-                                          ],
+                                        leading: SizedBox(
+                                          width: MediaQuery.of(context).size.width*.1,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Expanded(child: Text(ventes[i].clientName??'',overflow: TextOverflow.ellipsis,)),
+                                              Expanded(child: Text(ventes[i].phone1 ?? ventes[i].phone1 ??'-',overflow: TextOverflow.ellipsis,)),
+                                            ],
+                                          ),
                                         ),
                                         trailing: SizedBox(
                                           child: Column(
@@ -79,14 +85,15 @@ List<Vente> selectedCommands=[],ventes=[];
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                "Total =${ventes[i].totalPrice} DZD",
-                                                style: const TextStyle(
-                                                    color: secondaryColor,
-                                                    fontSize: 17,
-                                                    fontWeight: FontWeight.bold),
+                                              Expanded(
+                                                child: Text(
+                                                  "Total =${ventes[i].totalPrice} DZD",overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      color: secondaryColor,
+                                                      fontWeight: FontWeight.bold),
+                                                ),
                                               ),
-                                              Text("Payer par: ${ventes[i].userName}"),
+                                              Expanded(child: Text("Payer par: ${ventes[i].userName}",overflow: TextOverflow.ellipsis,)),
                                             ],
                                           ),
                                         ),
@@ -95,10 +102,9 @@ List<Vente> selectedCommands=[],ventes=[];
                                         title: Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              button('Versement', Icons.archive_outlined, (){},backgroundColor: Colors.green[600]),
-                                              const SizedBox(width: 20,),
+
                                               button('Imprimer', Icons.print, (){
 
                                               },backgroundColor: Colors.orange[800]),
@@ -106,7 +112,7 @@ List<Vente> selectedCommands=[],ventes=[];
                                               button('Archiver', Icons.archive_outlined, ()async{
                                                 await VenteCrtl.archiverVente(ventes[i],true);
                                               },
-                                              backgroundColor: Colors.blue,
+                                              backgroundColor: primaryColor,
                                               ),
                                               const SizedBox(width: 20,),
                                               button('Supprimer', Icons.archive_outlined, (){

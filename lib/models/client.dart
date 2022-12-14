@@ -3,7 +3,7 @@
 class Client {
   String? id, nom, prenom, phone1,phone2, wilaya, commune, createdAt;
 
-  int? totalCommandes,rest,versed, totalSpent, spentLastMonth;
+  int? totalCommandes,rest,verse, totalSpent, spentLastMonth;
 
   Client(
       {this.id,
@@ -16,7 +16,7 @@ class Client {
       this.createdAt,
       this.totalCommandes,
       this.totalSpent,
-        this.rest,this.versed,
+        this.rest,this.verse,
       this.spentLastMonth,
       });
 }

@@ -11,7 +11,7 @@ class VenteCrtl {
       phone1: data['phone1'],
       rest: data['rest'],
       createdAt: data['createdAt'],
-      versed: data['versed'],
+      verse: data['verse'],
       totalPrice: data['totalPrice'],
       userName: data['userName'],
       clientName: data['clientName'],
@@ -29,7 +29,7 @@ class VenteCrtl {
       'clientName': vente.clientName,
       'userName': vente.userName,
       'totalPrice': vente.totalPrice,
-      'versed': vente.versed,
+      'verse': vente.verse,
       'createdAt': vente.createdAt,
       'rest': vente.rest,
       'phone1': vente.phone1,
@@ -45,7 +45,7 @@ class VenteCrtl {
         .set(toJSON(vente));
     if(vente.clientId!.isNotEmpty){
       try{
-        await ClientCrtl.updateVersement(vente.clientId!, vente.versed!,vente.rest);
+        await ClientCrtl.updateVersement(vente.clientId!, vente.verse!,vente.rest);
       }
       catch(e){
         print(e);

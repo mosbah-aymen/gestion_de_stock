@@ -23,18 +23,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white54,
       body: Row(
         children: [
           SizedBox(
             width: MediaQuery.of(context).size.width * .22,
             height: MediaQuery.of(context).size.height,
-            child: Container(
-              color: Colors.blue,
-              child: SideMenu(onPageChanged: (s) {
-                idPage = s;
-                setState(() {});
-              }),
-            ),
+            child: SideMenu(onPageChanged: (s) {
+              idPage = s;
+              setState(() {});
+            }),
           ),
           Expanded(
               child: Container(
@@ -42,6 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
             height: MediaQuery.of(context).size.height,
             padding: const EdgeInsets.all(16),
             child: Card(
+              color: Colors.white.withOpacity(0.9),
+              elevation: 0,
               child: accueil(context, idPage),
             ),
           )),

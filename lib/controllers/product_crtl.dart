@@ -15,6 +15,7 @@ class ProductCrtl{
       'quantityInStock':product.quantityInStock??0,
       'prixAchat':product.prixAchat??0,
       'category':product.category??'',
+      'categoryColor':product.categoryColor??0,
       'mark':product.mark??'',
       'fournisseurPhone':product.fournisseurPhone??'',
       'fournisseurName':product.fournisseurName??'',
@@ -23,6 +24,8 @@ class ProductCrtl{
       'expDate':product.expDate??'',
       'fabDate':product.fabDate??'',
       'fournisseurId':product.fournisseurId??"",
+      'magasinName':product.magasinName??"",
+      'magasinId':product.magasinId??"",
       'history':product.history??[],
       'minQuantity':product.minQuantity??0,
       'unitPrice':product.unitPrice??0,
@@ -53,6 +56,9 @@ class ProductCrtl{
       description: data['description']??'',
       updatedAt: data['updatedAt']??'',
       id: id,
+      categoryColor: data['categoryColor']??Colors.black.value,
+      magasinId:data['magasinId']??'',
+      magasinName: data['magasinName']??'',
       danger: data['danger']??false,
     );
   }

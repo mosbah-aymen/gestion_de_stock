@@ -19,10 +19,10 @@ class NewVente extends StatefulWidget {
 
 class _NewVenteState extends State<NewVente> {
   Client? client;
-  TextEditingController? verse = TextEditingController(text: '0'),
+  TextEditingController? verseCrtl = TextEditingController(text: '0'),
       rest = TextEditingController(text: '0'),
       description = TextEditingController(text: '');
-  int total = 0, versed = 0, reste = 0;
+  int total = 0, verse = 0, reste = 0;
   List<int> qty = [];
   void calculeTotal() {
     total = 0;
@@ -160,11 +160,11 @@ class _NewVenteState extends State<NewVente> {
                                 borderColor: Colors.white,
                                 title: 'Verser',
                                 child: TextFormField(
-                                  controller: verse,
+                                  controller: verseCrtl,
                                   onChanged: (s) {
                                     setState(() {
-                                      versed=int.tryParse(s)?? 0 ;
-                                      reste = total - versed;
+                                      verse=int.tryParse(s)?? 0 ;
+                                      reste = total - verse;
                                     });
                                   },
                                   inputFormatters: [
@@ -478,9 +478,9 @@ class _NewVenteState extends State<NewVente> {
       Vente vente = Vente(
         createdAt: DateTime.now().toString(),
         totalPrice: total,
-        versed: versed,
+        verse: verse,
         products: widget.selectedProducts,
-        rest: total - versed,
+        rest: total - verse,
         clientId:client==null?'' :client!.id,
         clientName:client==null?'' : '${client!.nom!} ${client!.prenom!}',
         phone1: client==null?'' :client!.phone1,

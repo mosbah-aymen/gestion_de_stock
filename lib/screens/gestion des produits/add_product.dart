@@ -28,6 +28,7 @@ class _AddProductState extends State<AddProduct> {
       category = TextEditingController(text: ''),
       pAchat = TextEditingController();
   String fab = '', exp = '';
+  int color=0;
   @override
   void initState() {
     right = getRight();
@@ -232,6 +233,7 @@ class _AddProductState extends State<AddProduct> {
                                     onTap: () {
                                       category.text =
                                           categories[index].name ?? '';
+                                      color=categories[index].color!;
                                       setState(() {});
                                     },
                                   ),
@@ -330,6 +332,7 @@ class _AddProductState extends State<AddProduct> {
         ref: ref.text,
         mark: mark.text,
         category: category.text,
+        categoryColor: color,
         quantityInStock: int.tryParse(stock.text),
         minQuantity: int.tryParse(min.text),
         unitPrice: int.tryParse(pAchat.text),

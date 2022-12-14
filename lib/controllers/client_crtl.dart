@@ -9,7 +9,7 @@ class ClientCrtl{
       id: id,
       createdAt: data['createdAt'],
       rest: data['rest']??0,
-      versed: data['versed']??0,
+      verse: data['verse']??0,
       phone1: data['phone1']??'',
       spentLastMonth: data['spentLastMonth']??0,
       phone2: data['phone2']??"",
@@ -26,7 +26,7 @@ class ClientCrtl{
       'id':client.id,
       'commune':client.commune,
       'nom':client.nom,
-      'versed':client.versed??0,
+      'verse':client.verse??0,
       'rest':client.rest??0,
       'phone1':client.phone1,
       'phone2':client.phone2,
@@ -50,9 +50,9 @@ class ClientCrtl{
     await FirebaseFirestore.instance.collection('clients').doc(client.id).delete();
   }
 
-  static Future updateVersement(String clientId,int versed,rest)async{
+  static Future updateVersement(String clientId,int verse,rest)async{
    await FirebaseFirestore.instance.collection('clients').doc(clientId).update({
-      'versed':FieldValue.increment(versed),
+      'verse':FieldValue.increment(verse),
       'rest':FieldValue.increment(rest),
     });
   }

@@ -28,7 +28,14 @@ class _CategoriesState extends State<Categories> {
        },),
        HeaderElement(title: 'Supprimer',icon: Icons.delete,onTap: (){
         if(selectedCategorie!=null){
-
+          showDialog(context: context, builder: (context)=>AlertDialog(
+            title: Text('Voulez-vous vraiment supprimer cette catégorie?'),
+            actions: [TextButton(onPressed: (){
+              FirebaseFirestore.instance.collection('categories').doc(selectedCategorie!.id).delete();
+              Navigator.pop(context);
+            }, child: const Text('Supprimer')),
+            TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('Annuler'))],
+          ));
         }
       },)
     ],child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -41,17 +48,22 @@ class _CategoriesState extends State<Categories> {
           }
         }
         return SingleChildScrollView(
-          child: DataTable(
-            dataRowHeight: 35,
-            dividerThickness: 2,
-            showCheckboxColumn: true,
-            columns:const [
-              DataColumn(label: Text('Couleur')),
-              DataColumn(label: Text('Nom')),
-              DataColumn(label: Text('Créer Par')),
-              DataColumn(label: Text('Créer En')),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DataTable(
+                dataRowHeight: 30,
+                dividerThickness: 2,
+                showCheckboxColumn: true,
+                columns:const [
+                  DataColumn(label: Text('Couleur')),
+                  DataColumn(label: Text('Nom')),
+                  DataColumn(label: Text('Créer Par')),
+                  DataColumn(label: Text('Créer En')),
+                ],
+                rows:List.generate(categories.length, (index) => dataRow(categories[index],index)),
+              ),
             ],
-            rows:List.generate(categories.length, (index) => dataRow(categories[index],index)),
           ),
         );
       }
@@ -59,7 +71,7 @@ class _CategoriesState extends State<Categories> {
   }
   DataRow dataRow(Categorie categorie,int index){
     Color color =  (index % 2 == 0)
-              ? primaryColor.withOpacity(0.3)
+              ? primaryColor.withOpacity(0.1)
               : Colors.white12;
     return DataRow(
         onSelectChanged: (b) {

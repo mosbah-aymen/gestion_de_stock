@@ -5,9 +5,10 @@ class WorkSpace extends StatelessWidget {
   final List<HeaderElement> headChildren;
   final Widget? child;
   final Widget? searchBar;
+  final Color? bgColor;
   final List<String>? statTitles,statValues;
   const WorkSpace(
-      {Key? key, required this.headChildren, this.child, this.searchBar,this.statValues,this.statTitles})
+      {Key? key, required this.headChildren, this.child, this.searchBar,this.statValues,this.statTitles,this.bgColor})
       : super(key: key);
 
   @override

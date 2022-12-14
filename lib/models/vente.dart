@@ -4,7 +4,7 @@ import 'package:gestion_de_stock/imports.dart';
 class Vente {
   String? id, createdAt, clientName, phone1, phone2, clientId, userName;
   List<Product>? products = [];
-  int? totalPrice, versed, rest;
+  int? totalNet,remise,tva,ttc,timbre,autreTaxe, verse, rest,totalPrice;
 
   Vente({
     this.id,
@@ -16,7 +16,7 @@ class Vente {
     this.clientId,
     this.products,
     this.totalPrice,
-    this.versed,
+    this.verse,
     this.rest,
   });
 }

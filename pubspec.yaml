@@ -51,6 +51,11 @@ dependencies:
   overlay_support: ^2.0.1
   firebase_core_platform_interface: ^4.5.2
   flutter_colorpicker: ^1.0.3
+  pdf: ^3.8.4
+  flutter_pdfview: ^1.2.5
+  syncfusion_flutter_pdfviewer: ^20.3.59
+  printing: ^5.9.3
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:

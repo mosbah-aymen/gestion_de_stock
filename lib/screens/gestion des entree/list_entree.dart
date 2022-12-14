@@ -1,10 +1,17 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gestion_de_stock/components/search_field.dart';
 import 'package:gestion_de_stock/controllers/achat_crtl.dart';
+import 'package:gestion_de_stock/controllers/buildPdf.dart';
 import 'package:gestion_de_stock/imports.dart';
 import 'package:gestion_de_stock/models/achat.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
 import 'package:gestion_de_stock/components/workspace.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 
 class ListEntree extends StatefulWidget {
   static const String id = 'Gestion Des Achats';
@@ -25,6 +32,26 @@ class _ListEntreeState extends State<ListEntree> {
     super.initState();
   }
 
+  void getPdf(Achat achat) async{
+    await MyPdf.generateDocument(achat).then((value) {
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>Scaffold(
+        appBar: AppBar(backgroundColor: secondaryColor,),
+        body: PdfPreview(
+                   build: (format)=> value,
+                 ),
+      )));
+    });
+
+
+    // Uint8List uint8list = await MyPdf.generateDocument(achat);
+    // final output = await getTemporaryDirectory();
+    // final file = File('${output.path}/example.pdf');
+    // await file.writeAsBytes(await MyPdf.generateDocument(achat));
+    //
+    // await Printing.layoutPdf(
+    //       onLayout: (PdfPageFormat format) async =>await MyPdf.generateDocument(achat));
+  }
+
   @override
   Widget build(BuildContext context) {
     return WorkSpace(
@@ -37,7 +64,8 @@ class _ListEntreeState extends State<ListEntree> {
       ),
       child: SingleChildScrollView(
         child: SizedBox(
-          child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          child:
+          StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection('achats')
               .where('archived',isEqualTo: false)
@@ -71,6 +99,7 @@ class _ListEntreeState extends State<ListEntree> {
                               (i) => Card(
                                 margin: const EdgeInsets.all(10),
                                 child: ExpansionTile(
+                                  collapsedBackgroundColor: primaryColor.shade50,
                                   backgroundColor:
                                       primaryColor.withOpacity(0.1),
                                   textColor: secondaryColor,
@@ -102,17 +131,17 @@ class _ListEntreeState extends State<ListEntree> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      button('Versement', Icons.archive_outlined, (){},backgroundColor: Colors.green[600]),
-                                                                                  const SizedBox(width: 20,),
                                                                                   button('Imprimer', Icons.print, (){
-
+getPdf(achats[i]);
                                                                                   },backgroundColor: Colors.orange[800]),
                                                                                   const SizedBox(width: 20,),
                                       button('Archiver', Icons.archive_outlined, ()async{
                                         await AchatCrtl.archiverAchat(achats[i],true);
                                       },),
                                       const SizedBox(width: 20,),
-                                      button('Supprimer', Icons.archive_outlined, (){},backgroundColor: Colors.red),
+                                      button('Supprimer', Icons.archive_outlined, (){
+                                        AchatCrtl.delete(achats[i]);
+                                      },backgroundColor: Colors.red),
                                       ],
                                   ),
                                   children: [
@@ -174,7 +203,8 @@ class _ListEntreeState extends State<ListEntree> {
                                               (index) => myDataRow(
                                                   achats[i].products[index],
                                                   index))),
-                                    )
+                                    ),
+
                                   ],
                                 ),
                               ),

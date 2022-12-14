@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gestion_de_stock/components/search_field.dart';
+import 'package:gestion_de_stock/controllers/magasin_crtl.dart';
 import 'package:gestion_de_stock/controllers/product_crtl.dart';
 import 'package:gestion_de_stock/imports.dart';
+import 'package:gestion_de_stock/models/magasin.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20entree/add_achat.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/add_product.dart';
 import 'package:gestion_de_stock/screens/gestion%20des%20produits/product_details.dart';
@@ -18,6 +20,9 @@ class ListProducts extends StatefulWidget {
 
 class _ListProductsState extends State<ListProducts> {
   List<Product> products = [], selectedProducts = [];
+  List<Magasin> magasins=[];
+  Magasin? magasin;
+
   String search = '', plusVendu = '', plusEnStock = '';
   int totalEnStock = 0;
 
@@ -190,105 +195,156 @@ class _ListProductsState extends State<ListProducts> {
             }),
       ),
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream:
-              FirebaseFirestore.instance.collection('products').snapshots(),
-          builder: (context, snapshot) {
-            products = [];
-
-            if (snapshot.hasData) {
-              for (var value in snapshot.data!.docs) {
-                products.add(ProductCrtl.fromJSON(value.data(), value.id));
-              }
+        stream: FirebaseFirestore.instance.collection('magasins').snapshots(),
+        builder: (context, snapshot) {
+          magasins.clear();
+          if(snapshot.hasData){
+            for (var value in snapshot.data!.docs) {
+              magasins.add(MagasinCrtl.fromJSON(value.data(), value.id));
             }
-            return !snapshot.hasData
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ScrollConfiguration(
-              behavior: MyCustomScrollBehavior(),
-                  child: SingleChildScrollView(
-                    primary: true,
-                    scrollDirection: Axis.horizontal,
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: DataTable(
-                          decoration: const BoxDecoration(
-                            border: Border.symmetric(horizontal: BorderSide()),
+            magasin ??= magasins.first;
+
+          }
+          return !snapshot.hasData?
+              const CircularProgressIndicator()
+            :magasin==null?
+              const SizedBox()
+              : SizedBox(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream:
+                    FirebaseFirestore.instance.collection('products').where('magasinId',isEqualTo: magasin!.id).snapshots(),
+                builder: (context, snapshot) {
+                  products = [];
+                  if (snapshot.hasData) {
+                    for (var value in snapshot.data!.docs) {
+                     Product product= ProductCrtl.fromJSON(value.data(), value.id);
+                      products.add(product);
+
+                    }
+                  }
+                  return !snapshot.hasData
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : ScrollConfiguration(
+                    behavior: MyCustomScrollBehavior(),
+                        child: SingleChildScrollView(
+                          primary: true,
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                      height: 40,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            width: 300,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(width: 1,color: secondaryColor,),
+                                              borderRadius: BorderRadius.circular(5),
+                                            ),
+                                            child: PopupMenuButton(
+                                                child: Center(child: Text(magasin!.name.toString())),
+                                                itemBuilder: (context)=>List.generate(magasins.length,(index)=>PopupMenuItem(
+                                                    onTap: (){
+                                                      magasin=magasins[index];
+                                                      setState((){});
+                                                    },
+                                                    child: ListTile(
+                                              title: Text(magasins[index].name.toString()),
+                                              subtitle: Text('${magasins[index].wilaya} ${magasins[index].commune}'),
+                                            )))),
+                                          )
+                                        ],
+                                      )),
+                                  DataTable(
+                                    decoration: const BoxDecoration(
+                                      border: Border.symmetric(horizontal: BorderSide()),
+                                    ),
+                                      dividerThickness: 1,
+                                      dataRowColor: MaterialStateProperty.all(Colors.black12),
+                                      dataTextStyle: const TextStyle(fontSize: 12,
+                                      color: Colors.black,),
+                                      dataRowHeight: 30,
+                                      columnSpacing: 45,
+                                      columns:  [
+                                        DataColumn(
+                                          onSort: (int i,bool b){
+                                          },
+                                          label: const Text(
+                                            "Nº Ref",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const DataColumn(
+                                          label: Text(
+                                            "Nom",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const DataColumn(
+                                          label: Text(
+                                            "Catégory",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const DataColumn(
+                                          label: Text(
+                                            "Mark",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const DataColumn(
+                                          label: Text(
+                                            "Entrée en",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const DataColumn(
+                                          label: Text(
+                                            "Quantintée",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                        const DataColumn(
+                                          label: Text(
+                                            "Prix",
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        ),
+                                      ],
+                                      rows: List.generate(
+                                          products
+                                              .where((element) => conditions(element))
+                                              .length,
+                                          (index) => myDataRow(
+                                              products.where((element) => conditions(element))
+                                                  .elementAt(index),
+                                              index))),
+                                ],
+                              ),
+                            ),
                           ),
-                            dividerThickness: 1,
-                            dataRowColor: MaterialStateProperty.all(Colors.black12),
-                            dataTextStyle: const TextStyle(fontSize: 12,
-                            color: Colors.black,),
-                            dataRowHeight: 30,
-                            columnSpacing: 45,
-                            columns:  [
-                              DataColumn(
-                                onSort: (int i,bool b){
-                                },
-                                label: const Text(
-                                  "Nº Ref",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const DataColumn(
-                                label: Text(
-                                  "Nom",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const DataColumn(
-                                label: Text(
-                                  "Catégory",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const DataColumn(
-                                label: const Text(
-                                  "Mark",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  "Entrée en",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const DataColumn(
-                                label: const Text(
-                                  "Quantintée",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                              const DataColumn(
-                                label: Text(
-                                  "Prix",
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              ),
-                            ],
-                            rows: List.generate(
-                                products
-                                    .where((element) => conditions(element))
-                                    .length,
-                                (index) => myDataRow(
-                                    products.reversed
-                                        .where((element) => conditions(element))
-                                        .elementAt(index),
-                                    index))),
-                      ),
-                    ),
-                  ),
-                );
-          }),
+                        ),
+                      );
+                }),
+          );
+        }
+      ),
     );
   }
 
@@ -385,7 +441,13 @@ class _ListProductsState extends State<ListProducts> {
             },
           ),
           DataCell(
-            Text(product.category ?? ''),
+            Row(
+              children: [
+                Icon(Icons.radio_button_checked,color:Color( product.categoryColor!),size: 18,),
+                const SizedBox(width: 10,),
+                Text(product.category ?? ''),
+              ],
+            ),
             onTap: () {
               showDetails(product);
             },

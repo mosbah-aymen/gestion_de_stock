@@ -88,6 +88,7 @@ class _ListClientsState extends State<ListClients> {
                         scrollDirection: Axis.vertical,
                         child: DataTable(
                             dividerThickness: 2,
+                                                  dataRowHeight: 30,
                             columns: const [
                               DataColumn(
                                 label: Text(
@@ -164,7 +165,7 @@ class _ListClientsState extends State<ListClients> {
       }
       DataRow myDataRow(Client client, int index) {
         Color color = (index % 2 == 0)
-                ? secondaryColor.withOpacity(0.1)
+                ? primaryColor.withOpacity(0.1)
                 : Colors.white54;
         return DataRow(
             onSelectChanged: (b){
